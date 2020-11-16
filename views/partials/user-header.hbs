@@ -1,0 +1,78 @@
+<style>
+    @media all and (min-width: 992px) {
+	.navbar .nav-item .dropdown-menu{ display: none; }
+	.navbar .nav-item:hover .nav-link{ color: #fff;  }
+	.navbar .nav-item:hover .dropdown-menu{ display: block; }
+	.navbar .nav-item .dropdown-menu{ margin-top:0; }
+}
+</style>
+<header style="line-height: 2.5rem;">
+
+
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        
+        <a class="navbar-brand" href="/"><img src="/images/5898354-watch-dogs-logo-wallpaper-by-mstrpgi-50-free-on-zedge-watch-dogs-logo-640_1136.png" alt="" height="50px" width="50px" style="border-radius: 30px;padding: 2px;margin-right: 5px;">HourSpy</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown"> Categories </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"> Men's Watches</a></li>
+                        <li><a class="dropdown-item" href="#"> women's Watches </a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {{#if user}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart"><i class='fas fa-shopping-cart' style='font-size:18px'><span
+                                class="badge badge-danger" id="cart-count"
+                                style="font-size:10px;">{{cartCount}}</span></i></a>
+                </li>
+                <li class="nav-item mr-3 mr-lg-0">
+                    <a class="nav-link" href="#">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </li>
+                <li class="nav-item mr-3 mr-lg-0 dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-expanded="false" style="margin-right: 6rem;">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a style="cursor: default;" class="dropdown-item" href="">Hey,{{user.firstName}}</a></li>
+                        <li><a class="dropdown-item" href="/profile">My profile</a></li>
+                        <li><a class="dropdown-item" href="/myOrders">My orders</a></li>
+                        <li><a class="dropdown-item" href="/cart">My cart</a></li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/logout">Logout</a>
+                        </li>
+                    </ul>
+                </li>
+                {{else}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">signup</a>
+                </li>
+                {{/if}}
+
+            </ul>
+            {{!-- <form class="form-inline mt-2 mt-md-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form> --}}
+        </div>
+    </nav>
+</header>

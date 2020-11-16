@@ -1,0 +1,58 @@
+<style>
+    body {
+  background: #00b09b;
+  background: -webkit-linear-gradient(to right, #71cec3, #b58cf3);
+  background: linear-gradient(to right,  #53908b, #f1e8ff);
+  min-height: 100vh;
+}
+
+.text-gray {
+  color: #aaa;
+}
+</style>
+<div class="container py-5" style="max-width: 1100px;padding-top: 5rem!important;">
+
+  <!-- For demo purpose -->
+  <div class="row text-center text-white mb-5">
+    <div class="col-lg-7 mx-auto">
+      <h1 class="display-4" style="font-size: 3.5rem;font-weight: 500;line-height: 2.2;color: aliceblue;">My Orders</h1>
+      {{!-- <p class="lead mb-0">Create an elegant product list using Bootstrap 4 list group</p>
+      <p class="lead">Snippet by <a href="https://bootstrapious.com/snippets" class="text-white"> 
+                <u>Bootstrapious</u></a>
+      </p> --}}
+    </div>
+  </div>
+  <!-- End -->
+
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      
+      <!-- List group-->
+      <ul class="list-group shadow">
+        {{#each order}}
+        <!-- list group item-->
+        <li class="list-group-item">
+          <!-- Custom content-->
+          <div class="media align-items-lg-center flex-column flex-lg-row p-3">
+            <div class="media-body order-2 order-lg-1">
+              <h5 class="mt-0 font-weight-bold mb-2">{{this.product.product}} (x{{this.quantity}})</h5>
+              <p class="font-italic text-muted mb-0 small">{{this.product.description}}</p>
+              <div class="d-flex align-items-center justify-content-between mt-1">
+                <h6 class="font-weight-bold my-2">₹ {{this.product.price}}</h6>
+                
+              </div>
+              <div>
+                <p>Ordered Date: {{this.date}}</p><br>Payment Method: {{this.paymentMethod}} <br>
+                <P>Delivery Address:{{this.deliveryDetails.name}}<br>{{this.deliveryDetails.address}} <br>{{this.deliveryDetails.phone}} <br>{{this.deliveryDetails.pin}} <br></P>
+              </div>
+            </div><img src="/product-images/{{this.product._id}}.jpg" alt="Generic placeholder image" width="200" class="ml-lg-5 order-1 order-lg-2">
+          </div>
+          <!-- End -->
+        </li>
+        <!-- End -->
+      {{/each}}
+      </ul>
+      <!-- End -->
+    </div>
+  </div>
+</div>

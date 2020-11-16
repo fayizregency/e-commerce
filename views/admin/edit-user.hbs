@@ -1,0 +1,18 @@
+<div class="container">
+    <h3>Edit User</h3>
+    <form action="/admin/editUser/{{userOne._id}}"  method="POST">
+        <div class="form-group">
+            <label for="usr">First Name</label>
+            <input type="text" value="{{userOne.firstName}}" name="fname" class="form-control" id="fname" required="">
+        </div>
+        <div class="form-group">
+            <label for="usr">Last Name</label>
+            <input type="text" value="{{userOne.lastName}}" name="lname" class="form-control" id="lname" required="">
+        </div>
+        <div class="form-group">
+            <label for="usr">Email</label>
+            <input type="email" value="{{userOne.email}}" name="email" class="form-control" id="email" required="">
+        </div>
+        <button type="submit" class="btn btn-dark">Submit</button>
+    </form>
+</div>

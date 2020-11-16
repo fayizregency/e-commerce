@@ -1,0 +1,55 @@
+<style>
+    .container {
+    padding-top: 0rem;
+    margin-left: 300px;
+    margin-bottom: 0rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f7f1fd;
+    border-radius: 25px;
+    }
+    form{
+        width: 70%;
+    }
+</style>
+<div class="container">
+    <h3>Edit Products</h3>
+    <form action="/admin/editProduct/{{product._id}}" enctype="multipart/form-data" method="POST">
+        <div class="form-group">
+            <label for="usr">Product Name</label>
+            <input type="text" value="{{product.product}}" name="productName" class="form-control" id="usr" required="">
+        </div>
+        <div class="form-group">
+            <label for="comment">Product Description</label>
+            <textarea class="form-control"  name="productDescription" rows="5" id="comment">{{product.description}}</textarea>
+        </div>
+         <div class="form-group">
+            <label for="usr">Product Price</label>
+            <input type="text" name="productPrice" value="{{product.price}}" class="form-control" id="price" required="">
+        </div>
+        <div class="form-group">
+            <label for="cars">Choose a category:</label>
+            <select id="cars" name="category" class="form-control">
+                <option value="men">Men's</option>
+                <option value="women">Women's</option>
+            </select>
+        </div>
+         <div class="form-group">
+            <label for="usr">Product Quantity</label>
+            <input type="number" name="qty" value="{{product.qty}}" class="form-control" id="qty" required="">
+        </div>
+        <div class="form-group">
+            <label for="usr">Product Image</label>
+            <img src="/product-images/{{product._id}}.jpg" alt="404" id="imgView" height="100px" width="100px">
+            <input type="file" class="form-control"  name="img" id="img" onchange="viewImage(event)" accept="image/*" >
+        </div>
+        <button type="submit" class="btn btn-dark">Submit</button>
+    </form>
+</div>
+
+<script>
+    function viewImage(event){
+        document.getElementById('imgView').src=URL.createObjectURL(event.target.files[0])
+    }
+</script>
