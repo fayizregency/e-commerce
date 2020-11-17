@@ -155,10 +155,16 @@ router.get('/profile',verifyUser, async(req,res)=>{
 router.post('/addProfilePic',(req,res)=>{
   let id=req.session.userId;
   let image=req.files.file;
+  log
   console.log(req.files);
   image.mv("./public/user-images/" + id + ".jpg");
   res.json('response');
 });
+// router.get('/getMen', (req,res)=>{
+//   productHelpers.getCategory(men).then((product)=>{
+//     res.render
+//   })
+// })
 
 router.get('/logout',(req,res)=>{
   req.session.loggedIn=null;

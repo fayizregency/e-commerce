@@ -39,7 +39,7 @@ module.exports={
                     product:data.productName,
                     description:data.productDescription,
                     price:data.productPrice,
-                    category:product.category,
+                    category:data.category,
                     qty:data.qty
                 }
             }).then((data)=>{
@@ -54,14 +54,11 @@ module.exports={
             })
         })
     },
-    // getCatogory:(prodId)=>{
-    //     return new Promise((resolve,reject)=>{
-    //         db.get().collection(collection.PRODUCT_COLLECTION).aggregate([
-    //             {
-    //                 $match:{}
-    //             }
-    //         ])
-    //     })
-    // }
-
+    addToCategory:(prodId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).insertOne({productId:prodId}).then((response)=>{
+                resolve(response);
+            })
+        })
+    }
 }

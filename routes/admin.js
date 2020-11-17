@@ -6,7 +6,10 @@ var productHelpers = require("../helpers/product-helpers");
 var userHelpers = require("../helpers/user-helpers");
 const date = require('date-and-time');
 const pattern = date.compile('DD- MM- YYYY');
+var base64ToImage = require('base64-to-image');
+// var fs=require('fs');
 /* GET users listing. */
+
 const verifyAdmin = (req, res, next) => {
   if (req.session.admin) {
     next();
@@ -63,16 +66,14 @@ router.get("/addProduct", verifyAdmin, function (req, res, next) {
 });
 
 router.post("/addProduct", function (req, res, next) {
-  let image = req.files.img;
-  console.log(req.body);
+  
   productHelpers.addProduct(req.body).then((id) => {
-    image.mv("./public/product-images/" + id + ".jpg", (err) => {
-      if (!err) {
-        res.redirect("/admin/products");
-      } else {
-        console.log(err);
-      }
-    });
+    productHelpers.addToCategory(id);
+    var base64Str = req.body.croppedImg;
+    var path ='./public/product-images/';
+    var optionalObj = {'fileName': id, 'type':'jpg'};
+    base64ToImage(base64Str,path,optionalObj);
+    res.redirect("/admin/products");
   });
 });
 

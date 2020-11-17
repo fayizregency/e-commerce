@@ -65,14 +65,14 @@
     <!-- Three columns of text below the carousel -->
     <div class="row">
     {{#each product}}
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6 col-lg-4" style="margin-bottom:4rem">
             <a href="/view/{{this._id}}"><img class="rounded-circle"
                 src="/product-images/{{this._id}}.jpg"
                 alt="Generic placeholder image" width="140" height="140"></a>
             <h2>{{this.product}}</h2>
             <p>{{this.description}}</p>
             <p>Rs. {{this.price}}</p>
-            <p><button class="btn btn-secondary" onclick="addToCart('{{this._id}}')" role="button">Add to cart &raquo;</button></p>
+            <p><button class="btn btn-secondary" onclick="addToCart('{{this._id}}')" role="button" style="background-color:#03121f">Add to cart &raquo;</button></p>
         </div><!-- /.col-lg-4 -->  
     {{/each}}
     </div><!-- /.row -->
@@ -93,7 +93,7 @@
                 tellus ac cursus commodo.</p>
         </div>
         <div class="col-md-5">
-            <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto"
+            <img class="featurette-image img-fluid mx-auto" src="https://cdn4.ethoswatches.com/the-watch-guide/wp-content/uploads/2017/10/Ethos-Watch-Awards-2017-20-best-watches-men-1.jpg"
                 alt="Generic placeholder image">
         </div>
     </div>
@@ -109,7 +109,7 @@
                 tellus ac cursus commodo.</p>
         </div>
         <div class="col-md-5 order-md-1">
-            <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto"
+            <img class="featurette-image img-fluid mx-auto" src="https://cdn11.bigcommerce.com/s-pkla4xn3/images/stencil/1280x1280/products/22870/205739/BENYAR-Men-Watches-Brand-Luxury-Silicone-Strap-Waterproof-Sport-Quartz-Chronograph-Military-Watch-Men-Clock-Relogio__22157.1547880337.jpg?c=2?imbypass=on"
                 alt="Generic placeholder image">
         </div>
     </div>
@@ -124,7 +124,7 @@
                 tellus ac cursus commodo.</p>
         </div>
         <div class="col-md-5">
-            <img class="featurette-image img-fluid mx-auto" data-src="holder.js/500x500/auto"
+            <img class="featurette-image img-fluid mx-auto" src="https://i.pinimg.com/originals/3e/9f/e6/3e9fe68edca17c27825fbfe5bfce8ff9.jpg"
                 alt="Generic placeholder image">
         </div>
     </div>

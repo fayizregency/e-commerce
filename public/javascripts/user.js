@@ -132,7 +132,7 @@ $(document).ready(function () {});
 
 // remove one cart prodect
 function removeCart(cartId, prodId) {
-  console.log(cartId, prodId);
+  if (confirm("Are you sure?")){
   $.ajax({
     url: "/removeCart",
     method: "post",
@@ -146,6 +146,7 @@ function removeCart(cartId, prodId) {
       }
     },
   });
+}
 }
 // order checkout
 $("#checkout-form").submit((e) => {
@@ -162,7 +163,9 @@ $("#checkout-form").submit((e) => {
     },
   });
 });
-// add profile picture
+
+
+// -------- add profile picture
 $("#profileImage").click(function (e) {
   $("#fileInput").click();
 });
@@ -173,7 +176,7 @@ var canvas = $("#canvas"),
 $("#fileInput").on("change", function () {
   if (this.files && this.files[0]) {
     if (this.files[0].type.match(/^image\//)) {
-      $("#exampleModalCenter").modal("show");
+      $("#exampleModalCenter").modal("show"); //---open model----//
       var reader = new FileReader();
       reader.onload = function (evt) {
         var img = new Image();
@@ -223,8 +226,8 @@ $("#fileInput").on("change", function () {
     alert("No file(s) selected.");
   }
 });
-// convert base 64 to file 
-function dataURLtoFile(dataurl, filename) {
+// *****************convert base 64 to file******************* 
+function dataURLtoFile(dataurl, filename) { 
  
   var arr = dataurl.split(','),
       mime = arr[0].match(/:(.*?);/)[1],
@@ -238,3 +241,4 @@ function dataURLtoFile(dataurl, filename) {
   
   return new File([u8arr], filename, {type:mime});
 }
+//  ---- end of add profile pic 
