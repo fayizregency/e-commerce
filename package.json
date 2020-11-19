@@ -6,6 +6,7 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
+    "base64-to-image": "^1.0.2",
     "bcrypt": "^5.0.0",
     "cookie-parser": "~1.4.4",
     "date-and-time": "^0.14.1",
@@ -23,7 +24,8 @@
     "nocache": "^2.1.0",
     "node-nocache": "^1.0.5",
     "nodemon": "^2.0.6",
-    "order-id": "^2.1.0"
+    "order-id": "^2.1.0",
+    "razorpay": "^2.0.6"
   },
   "main": "app.js",
   "devDependencies": {

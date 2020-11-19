@@ -132,38 +132,158 @@ $(document).ready(function () {});
 
 // remove one cart prodect
 function removeCart(cartId, prodId) {
-  if (confirm("Are you sure?")){
-  $.ajax({
-    url: "/removeCart",
-    method: "post",
-    data: {
-      cart: cartId,
-      product: prodId,
-    },
-    success: (response) => {
-      if (response) {
-        location.reload();
-      }
-    },
-  });
+  if (confirm("Are you sure?")) {
+    $.ajax({
+      url: "/removeCart",
+      method: "post",
+      data: {
+        cart: cartId,
+        product: prodId,
+      },
+      success: (response) => {
+        if (response) {
+          location.reload();
+        }
+      },
+    });
+  }
 }
-}
-// order checkout
+//**************** */ order checkout
 $("#checkout-form").submit((e) => {
   e.preventDefault();
+  var myform = document.getElementById("checkout-form");
+  var fd = new FormData(myform );
+  let checked=false;
+  if ($('#defaultCheck1').is(":checked"))
+  {
+    checked=true;
+  }else{
+    checked=false;
+  }
+  fd.append("checked",checked);
   $.ajax({
     url: "/placeOrder",
     method: "post",
-    data: $("#checkout-form").serialize(),
+    data: fd,
+    cache: false,
+    processData: false,
+    contentType: false,
     success: (response) => {
-      let id=response.status;
-      if (response.status) {
+      if (response.cod) {
+        console.log(response.cod);
+        let id = response.cod;
         location.href = `/orderSummary/${id}`;
+      } else if (response.online) {
+        console.log(response.online);
+        razorpayPayment(response.online);
+      } else if (response.paypal) {
+        // document.getElementById('checkout-id').style.display= none;
+        document.querySelector("#place-order-id").style.display = "none";
+        let id = response.paypal.id;
+        let amount = response.paypal.amount;
+        paypalPayment(id, amount);
       }
     },
   });
 });
+// ******************* razorpay payment ***********//
+function razorpayPayment(order) {
+  var options = {
+    key: "rzp_test_6jhrsB3r51nyzO", // Enter the Key ID generated from the Dashboard
+    amount: order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    currency: "INR",
+    name: "HourSpy",
+    description: "Test Transaction",
+    image: "https://example.com/your_logo",
+    order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    handler: function (response) {
+      verifyPayment(response, order);
+    },
+    prefill: {
+      name: "Gaurav Kumar",
+      email: "gaurav.kumar@example.com",
+      contact: "9999999999",
+    },
+    notes: {
+      address: "Razorpay Corporate Office",
+    },
+    theme: {
+      color: "#3399cc",
+    },
+  };
+  var rzp1 = new Razorpay(options);
+  rzp1.open();
+}
 
+function verifyPayment(payment, order) {
+  $.ajax({
+    url: "/verifyPayment",
+    method: "post",
+    data: {
+      payment,
+      order,
+    },
+    success: (response) => {
+      if (response.status) {
+        let id = response.status;
+        location.href = `/orderSummary/${id}`;
+      } else {
+        alert("payment failed");
+      }
+    },
+  });
+}
+//************* pay pal payment ***********
+function paypalPayment(orderId, amount) {
+  paypal
+    .Buttons({
+      // Set up the transaction
+      createOrder: function (data, actions) {
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                currency_code: "USD",
+                value: amount,
+              },
+            },
+          ],
+        });
+      },
+
+      // Finalize the transaction
+      onApprove: function (data, actions) {
+        return actions.order.capture().then(function (details) {
+          // Show a success message to the buyer
+          verifyPaypal(orderId);
+        });
+      },
+
+      style: {
+        color: "blue",
+        shape: "pill",
+        label: "pay",
+        height: 40,
+      },
+    })
+    .render("#paypal-button-container");
+}
+
+function verifyPaypal(orderId) {
+  console.log(orderId);
+  console.log("breeewwwww");
+  $.ajax({
+    url: "/verifyPaypal",
+    method: "post",
+    data: { orderId: orderId },
+    success: (response) => {
+      if (response) {
+        location.href = `/orderSummary/${orderId}`;
+      }
+    },
+  });
+}
+//*************/ end of order checkout
 
 // -------- add profile picture
 $("#profileImage").click(function (e) {
@@ -171,7 +291,7 @@ $("#profileImage").click(function (e) {
 });
 
 var canvas = $("#canvas"),
-  context = canvas.get(0).getContext("2d")
+  context = canvas.get(0).getContext("2d");
 
 $("#fileInput").on("change", function () {
   if (this.files && this.files[0]) {
@@ -194,24 +314,24 @@ $("#fileInput").on("change", function () {
             var croppedImageDataURL = canvas
               .cropper("getCroppedCanvas")
               .toDataURL("image/jpg");
-              var file = dataURLtoFile(croppedImageDataURL,'abc.jpg');
+            var file = dataURLtoFile(croppedImageDataURL, "abc.jpg");
 
-              var fd = new FormData();
-              fd.append("file", file);
+            var fd = new FormData();
+            fd.append("file", file);
 
-              $.ajax({
-                method: "POST",
-                url: "/addProfilePic",
-                data: fd,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: (response) => {
-                  // $("#profile-pic").attr("src",response); 
-                  // $("#profile-pic").show();
-                  location.reload();
-                },
-              });
+            $.ajax({
+              method: "POST",
+              url: "/addProfilePic",
+              data: fd,
+              cache: false,
+              contentType: false,
+              processData: false,
+              success: (response) => {
+                // $("#profile-pic").attr("src",response);
+                // $("#profile-pic").show();
+                location.reload();
+              },
+            });
 
             $("#exampleModalCenter").modal("hide");
           });
@@ -226,19 +346,28 @@ $("#fileInput").on("change", function () {
     alert("No file(s) selected.");
   }
 });
-// *****************convert base 64 to file******************* 
-function dataURLtoFile(dataurl, filename) { 
- 
-  var arr = dataurl.split(','),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]), 
-      n = bstr.length, 
-      u8arr = new Uint8Array(n);
-      
-  while(n--){
-      u8arr[n] = bstr.charCodeAt(n);
+// *****************convert base 64 to file*******************
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(","),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
   }
-  
-  return new File([u8arr], filename, {type:mime});
+
+  return new File([u8arr], filename, { type: mime });
 }
-//  ---- end of add profile pic 
+//  ---- end of add profile pic
+// $(document).ready(function(){
+//   $("#paypal").click(function() {
+
+//       $("#paypalbtns").css("display", "block");
+//       // $(".noUser").css("display", "block");
+//   });
+// });
+// function showBtn(){
+//   $(".payp").show();
+// }

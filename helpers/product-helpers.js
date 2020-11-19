@@ -1,6 +1,8 @@
 var db=require('../config/connection');
 var collection=require('../config/collections');
 const { response } = require('express');
+const { promises } = require('fs');
+const { resolve } = require('path');
 var objId=require('mongodb').ObjectID;
 module.exports={
     addProduct: (product)=> {
@@ -54,11 +56,17 @@ module.exports={
             })
         })
     },
-    addToCategory:(prodId)=>{
+    addToCategory:(category)=>{
         return new Promise((resolve,reject)=>{
-            db.get().collection(collection.PRODUCT_COLLECTION).insertOne({productId:prodId}).then((response)=>{
+            db.get().collection(collection.CATEGORY_COLLECTION).insertOne(category).then((response)=>{
                 resolve(response);
             })
+        })
+    },
+    getAllCategory:()=>{
+        return new Promise(async(resolve,reject)=>{
+            let category=await db.get().collection(collection.CATEGORY_COLLECTION).find().toArray();
+                resolve(category);
         })
     }
 }

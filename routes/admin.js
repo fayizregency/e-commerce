@@ -5,7 +5,7 @@ var router = express.Router();
 var productHelpers = require("../helpers/product-helpers");
 var userHelpers = require("../helpers/user-helpers");
 const date = require('date-and-time');
-const pattern = date.compile('DD- MM- YYYY');
+const pattern = date.compile("ddd, MMM DD YYYY");
 var base64ToImage = require('base64-to-image');
 // var fs=require('fs');
 /* GET users listing. */
@@ -49,8 +49,9 @@ router.post("/login", (req, res) => {
 
 router.get("/orders", verifyAdmin, function (req, res, next) {
   userHelpers.getAllOrders().then((orders)=>{
-    console.log(orders);
-    // orders.date=date.format(orders.date, pattern);
+    orders.forEach(element => {
+      element.date=date.format(element.date, pattern);
+    });
     res.render("admin/orders", { admin: true, orders });
   })
 });
@@ -61,14 +62,13 @@ router.get("/products", verifyAdmin, function (req, res, next) {
   });
 });
 
-router.get("/addProduct", verifyAdmin, function (req, res, next) {
-  res.render("admin/add-product",{admin:true});
+router.get("/addProduct", verifyAdmin,async function (req, res, next) {
+  let category=await productHelpers.getAllCategory();
+  res.render("admin/add-product",{admin:true, category});
 });
 
 router.post("/addProduct", function (req, res, next) {
-  
   productHelpers.addProduct(req.body).then((id) => {
-    productHelpers.addToCategory(id);
     var base64Str = req.body.croppedImg;
     var path ='./public/product-images/';
     var optionalObj = {'fileName': id, 'type':'jpg'};
@@ -103,6 +103,19 @@ router.get("/deleteProduct/:id", verifyAdmin, (req, res) => {
       console.log("product delete failed");
     }
   });
+});
+router.get('/category', verifyAdmin,(req,res)=>{
+  productHelpers.getAllCategory().then((category)=>{
+    res.render('admin/categories',{admin:true, category});
+  })
+});
+router.get('/addCategory', verifyAdmin,(req,res)=>{
+    res.render('admin/add-category',{admin:true});
+});
+router.post('/addCategory',(req,res)=>{
+  productHelpers.addToCategory(req.body).then(()=>{
+    res.redirect('/admin/category');
+  })
 });
 
 router.get("/users", verifyAdmin, function (req, res, next) {

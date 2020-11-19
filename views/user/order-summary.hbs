@@ -60,6 +60,11 @@
             margin: 0 !important;
         }
     </style>
+    <script>
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+</script> 
 
 <body style="margin: 0 !important; padding: 0 !important; background-color: #eeeeee;" bgcolor="#eeeeee">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -175,3 +180,5 @@
             </td>
         </tr>
     </table>
+ 
+ 
