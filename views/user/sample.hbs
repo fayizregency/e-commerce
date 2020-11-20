@@ -1,44 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
+<link rel="stylesheet" href="https://codepen.io/imgix/pen/d06269809bb83c85326ebbbf7e81241b">
+<link rel="stylesheet" href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/164071/drift-basic.css">
+<style>
+  .demo-area{
+  background:$color_invert_fg;
+  border-radius:8px;
+  padding:20px;
+  section{
+    padding-top:0;
+  }
+}
 
-<div class="container">
-  <h2>Modal Example</h2>
-  <!-- Trigger the modal with a button -->
-  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+.demo-trigger {
+  display: inline-block;
+  width: 30%;
+  float: left;
+}
 
-  <!-- Modal -->
- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Crop Image</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                
-                    Your browser does not support the HTML5 canvas element.
-              
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" id="btnCrop" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-</div>
+.detail {
+  position: relative;
+  width: 65%;
+  margin-left: 5%;
+  float: left;
+  button{
+    vertical-align:middle;
+    opacity:.5;
+    cursor:unset;
+    background:$color_invert_chrome_tint;
+    margin-left:1em;
+  }
+}
 
-</body>
-</html>
+
+@media (max-width: 610px) {
+
+  .detail, .demo-trigger {
+    float: none;
+  }
+
+  .demo-trigger {
+    display:block;
+    width: 50%;
+    max-width:200px;
+    margin: 0 auto;
+  }
+
+  .detail {
+    margin: 0;
+    width: auto;
+  }
+
+  p {
+    margin: 0 auto 1em;
+  }
+
+  .responsive-hint {
+    display: none;
+  }
+  h3 {
+    margin-top:20px;
+  }
+}
+</style>
+<section class="content">
+  <article class="demo-area">
+  <img class="demo-trigger" src="https://demos.imgix.net/wristwatch.jpg?w=200&ch=DPR&dpr=2&border=1,ddd" data-zoom="https://demos.imgix.net/wristwatch.jpg?w=1000&ch=DPR&dpr=2">
+  <div class="detail">
+   <section>
+      <h3>Men's Watch - Drift Demo</h3>
+      <p>Specifications:</p>
+      <ul>
+        <li>Hover over image</li>
+        <li>35 mm stainless steel case</li>
+        <li>Stainless link bracelet with buckle closure</li>
+        <li>Water resistant to 100m</li>
+      </ul>
+      <h4>$XX.XX <button>Add to Cart</button></h4>
+    </section>
+  </div>
+  </article>
+</section>
+<section class="content">
+  <article>
+     <h1>Drift</h1>
+    <p>This is a demo of Drift, a simple, lightweight, no-dependencies JavaScript "zoom on hover" tool from <a href="https://imgix.com">imgix</a>. Move your mouse over the image (or touch it) to see it in action. This demo uses the simple included theme, but it's very easy to extend and customize to fit your needs. You can <a href="https://github.com/imgix/drift">learn more and download it here</a>.</p>
+          <p class="responsive-hint">(Psst…&nbsp;try making your browser window smaller!)</p>
+     <div class="button-group">
+       <a href="https://github.com/imgix/luminous" class="button" target="_blank">View on github</a>
+       <a href="https://imgix.com" target="_blank" class="button">Visit imgix.com</a>
+    </div>
+  </article>
+</section>
+<footer>
+  <hr>
+<a href="https://imgix.com"><img src="https://assets.imgix.net/presskit/imgix-presskit.pdf?page=3&fm=png&w=320&dpr=2" width="160" height="60"></a>
+</footer>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/164071/Drift.min.js"></script>
+<script>
+  var demoTrigger = document.querySelector('.demo-trigger');
+var paneContainer = document.querySelector('.detail');
+
+new Drift(demoTrigger, {
+  paneContainer: paneContainer,
+  inlinePane: false,
+});
+</script>

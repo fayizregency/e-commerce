@@ -7,6 +7,7 @@ var userHelpers = require("../helpers/user-helpers");
 const date = require('date-and-time');
 const pattern = date.compile("ddd, MMM DD YYYY");
 var base64ToImage = require('base64-to-image');
+const numWords = require('num-words')
 // var fs=require('fs');
 /* GET users listing. */
 
@@ -78,9 +79,10 @@ router.post("/addProduct", function (req, res, next) {
 });
 
 router.get("/editProduct/:id", verifyAdmin, async function (req, res, next) {
+  let category=await productHelpers.getAllCategory();
   let prodId = req.params.id;
   let product = await productHelpers.getOneProduct(prodId);
-  res.render("admin/edit-product", {admin:true, product });
+  res.render("admin/edit-product", {admin:true, product ,category});
 });
 
 router.post("/editProduct/:id", function (req, res, next) {
@@ -162,6 +164,15 @@ router.get("/deleteUser/:id", verifyAdmin, function (req, res, next) {
     res.redirect("/admin/users");
   });
 });
+
+router.get('/reports', async (req,res)=>{
+  let product_count=await productHelpers.getTotalNumberOfProducts();
+  let user_count= await userHelpers.getTotalNoOfUsers();
+  let userInWords = numWords(user_count);
+  let productInWords = numWords(product_count);
+  res.render('admin/reports',{admin:true , product_count, user_count ,userInWords, productInWords});
+});
+
 
 router.get("/signout", (req, res) => {
   req.session.admin = null;

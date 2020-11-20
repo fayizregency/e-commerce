@@ -24,6 +24,7 @@
     "nocache": "^2.1.0",
     "node-nocache": "^1.0.5",
     "nodemon": "^2.0.6",
+    "num-words": "^1.2.2",
     "order-id": "^2.1.0",
     "razorpay": "^2.0.6"
   },

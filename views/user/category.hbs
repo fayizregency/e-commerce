@@ -1,0 +1,16 @@
+<div class="container marketing" style="padding-top:10rem">
+
+    <!-- Three columns of text below the carousel -->
+    <div class="row">
+    {{#each products}}
+        <div class="col-lg-4">
+            <img class="rounded-circle"
+                src="/product-images/{{this._id}}.jpg"
+                alt="Generic placeholder image" width="140" height="140">
+            <h2>{{this.product}}</h2>
+            <p>{{this.description}}</p>
+            <p><a class="btn btn-secondary" onclick="addToCart('{{this._id}}')" role="button" style="background-color:#03121f">Add to cart &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+    {{/each}}
+    </div><!-- /.row -->
+</div>

@@ -31,8 +31,9 @@
         <div class="form-group">
             <label for="cars">Choose a category:</label>
             <select id="cars" name="category" class="form-control">
-                <option value="men">Men's</option>
-                <option value="women">Women's</option>
+                {{#each category}}
+                <option value="{{this.category}}">{{this.category}}</option>
+                {{/each}}
             </select>
         </div>
          <div class="form-group">

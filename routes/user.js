@@ -21,6 +21,7 @@ router.get("/", nocache, async function (req, res, next) {
   if (req.session.loggedIn) {
     cartCount = await userHelpers.getCartCount(req.session.userId);
   }
+  let categories=await productHelpers.getAllCategory();
   productHelpers.getProduct().then((product) => {
     let user = req.session.user;
     res.render("user/home", {
@@ -28,6 +29,7 @@ router.get("/", nocache, async function (req, res, next) {
       product,
       cartCount,
       loggedIn: req.session.loggedIn,
+      categories
     });
   });
 });
@@ -79,11 +81,12 @@ router.get("/view/:id", async (req, res) => {
   let id = req.params.id;
   let user = req.session.user;
   let cartCount = null;
+  let categories=await productHelpers.getAllCategory();
   if (req.session.loggedIn) {
     cartCount = await userHelpers.getCartCount(req.session.userId);
   }
   productHelpers.getOneProduct(id).then((product) => {
-    res.render("user/view-product", { user, product, cartCount });
+    res.render("user/view-product", { user, product, cartCount, categories });
   });
 });
 
@@ -127,6 +130,7 @@ router.post("/removeCart", (req, res) => {
   });
 });
 router.get("/checkout", verifyUser, async (req, res) => {
+  let address=await userHelpers.getUserAddress(req.session.userId);
   userHelpers.getCart(req.session.userId).then(async (products) => {
     let cartCount = await userHelpers.getCartCount(req.session.userId);
     let totalPrice = await userHelpers.getTotalPrice(req.session.userId);
@@ -135,6 +139,7 @@ router.get("/checkout", verifyUser, async (req, res) => {
       products,
       totalPrice,
       cartCount,
+      address
     });
   });
 });
@@ -149,7 +154,6 @@ router.post("/placeOrder", async (req, res) => {
       userHelpers
         .generateRazorpay(response.id, response.amount)
         .then((razorpay) => {
-          // console.log("************"+razorpay);
           res.json({ online: razorpay });
         });
     } else if (req.body.paymentMethod === "paypal") {
@@ -162,7 +166,8 @@ router.post("/placeOrder", async (req, res) => {
     }
   });
 
-  if(req.body.checked){   //**********saving user address ***********//
+  if(req.body.checked=="true"){   //**********saving user address ***********//
+    console.log(req.body.checked);
     userHelpers.saveAdress(req.body).then(()=>{
       console.log('address saved');
     })
@@ -222,19 +227,40 @@ router.get("/myOrders", verifyUser, async (req, res) => {
 });
 
 router.get("/profile", verifyUser, async (req, res) => {
+  let address=await userHelpers.getUserAddress(req.session.userId);
+  console.log(address);
   userHelpers.getOneUser(req.session.userId).then((profile) => {
     profile.firstName = profile.firstName.toUpperCase();
     profile.lastName = profile.lastName.toUpperCase();
-    res.render("user/profile", { user: req.session.user, profile });
+    res.render("user/profile", { user: req.session.user, profile ,address});
   });
 });
 router.post("/addProfilePic", (req, res) => {
   let id = req.session.userId;
   let image = req.files.file;
-  // console.log(req.files);
+  // console.log(req.files);  
   image.mv("./public/user-images/" + id + ".jpg");
   res.json("response");
 });
+
+router.post('/useAddress', async(req,res)=>{
+  let addressId=req.body.id;
+  let address=await userHelpers.getOneAddress(addressId);
+  res.json({address:address});
+});
+
+router.get('/getCategory/:category', async(req,res)=>{
+  let category=req.params.category;
+  let user = req.session.user;
+  let categories=await productHelpers.getAllCategory();
+  let cartCount = null;
+  if (req.session.loggedIn) {
+    cartCount = await userHelpers.getCartCount(req.session.userId);
+  }
+  productHelpers.getOneCategory(category).then((products)=>{
+    res.render('user/category',{user, products ,categories ,cartCount});
+  })
+})
 
 router.get("/logout", (req, res) => {
   req.session.loggedIn = null;

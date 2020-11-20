@@ -24,8 +24,9 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link  dropdown-toggle" href="#" data-toggle="dropdown"> Categories </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/getMen"> Men's Watches</a></li>
-                        <li><a class="dropdown-item" href="/getWomen"> women's Watches </a></li>
+                        {{#each categories}}
+                        <li><a class="dropdown-item" href="/getCategory/{{this.category}}">{{this.category}}</a></li>
+                        {{/each}}
                     </ul>
                 </li>
                 <li class="nav-item">

@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://codepen.io/imgix/pen/d06269809bb83c85326ebbbf7e81241b">
+<link rel="stylesheet" href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/164071/drift-basic.css">
 
 <!--Section: Block Content-->
 <section class="mb-5 container" style="margin-top: 10rem;background-color: #f1f5f9;">
@@ -16,7 +18,7 @@
               <a href=""
                 data-size="710x823">
                 <img src="/product-images/{{product._id}}.jpg"
-                  class="img-fluid z-depth-1" height="240px" width="240px">
+                  class="img-fluid z-depth-1 demo-trigger" height="240px" width="240px" data-zoom="/product-images/{{product._id}}.jpg">
               </a>
             </figure>
           </div>
@@ -26,7 +28,7 @@
       </div>
 
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 detail">
     <hr>
       <h5>{{product.product}}</h5>
       <p class="mb-2 text-muted text-uppercase small">watch</p>
@@ -79,3 +81,14 @@
 
 </section>
 <!--Section: Block Content-->
+  {{!-- product zoom script  --}}
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/164071/Drift.min.js"></script>
+<script>
+  var demoTrigger = document.querySelector('.demo-trigger');
+var paneContainer = document.querySelector('.detail');
+
+new Drift(demoTrigger, {
+  paneContainer: paneContainer,
+  inlinePane: false,
+});
+</script>

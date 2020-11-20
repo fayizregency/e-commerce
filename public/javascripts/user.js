@@ -128,7 +128,7 @@ function disableMinus(prodId) {
   }
 }
 
-$(document).ready(function () {});
+// $(document).ready(function () {});
 
 // remove one cart prodect
 function removeCart(cartId, prodId) {
@@ -152,15 +152,14 @@ function removeCart(cartId, prodId) {
 $("#checkout-form").submit((e) => {
   e.preventDefault();
   var myform = document.getElementById("checkout-form");
-  var fd = new FormData(myform );
-  let checked=false;
-  if ($('#defaultCheck1').is(":checked"))
-  {
-    checked=true;
-  }else{
-    checked=false;
+  var fd = new FormData(myform);
+  let checked = false;
+  if ($("#defaultCheck1").is(":checked")) {
+    checked = true;
+  } else {
+    checked = false;
   }
-  fd.append("checked",checked);
+  fd.append("checked", checked);
   $.ajax({
     url: "/placeOrder",
     method: "post",
@@ -361,13 +360,33 @@ function dataURLtoFile(dataurl, filename) {
   return new File([u8arr], filename, { type: mime });
 }
 //  ---- end of add profile pic
-// $(document).ready(function(){
-//   $("#paypal").click(function() {
 
-//       $("#paypalbtns").css("display", "block");
-//       // $(".noUser").css("display", "block");
-//   });
-// });
-// function showBtn(){
-//   $(".payp").show();
-// }
+// -----use saved address
+
+function useAddress(addressId) {
+  $.ajax({
+    url: "/useAddress",
+    method: "post",
+    data: {
+      id: addressId,
+    },
+    success: (response) => {
+      $("#firstName").val(response.address.name);
+      $("#email").val(response.address.email);
+      $("#address").val(response.address.address);
+      $("#mobile").val(response.address.phone);
+      $("#zip").val(response.address.pin);
+      $("#form-hide-btn").show();
+      $("#form-hide-div").hide();
+    },
+  });
+}
+function showForm() {
+  $("#form-hide-btn").hide();
+  $("#form-hide-div").show();
+  $("#firstName").val("");
+  $("#email").val("");
+  $("#address").val("");
+  $("#mobile").val("");
+  $("#zip").val("");
+}

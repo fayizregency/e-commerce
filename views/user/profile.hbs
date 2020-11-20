@@ -67,7 +67,6 @@
     #profileImage {
         cursor: pointer;
     }
-    
 </style>
 <div class="container">
     <div class="main-body" style="padding: 84px;margin-top: 5rem;">
@@ -78,14 +77,14 @@
                     <div class="card-body">
                         <div class="d-flex flex-column align-items-center text-center">
                             <div class="preview"><img id="profile-pic" src="/user-images/{{profile._id}}.jpg" alt="user"
-                                class="rounded-circle" width="150" height="150"></div>
+                                    class="rounded-circle" width="150" height="150"></div>
                             <div class="mt-3">
                                 <h4>{{profile.firstName}}</h4>
                                 <form action="" id="profile-form" method="POST" enctype="multipart/form-data">
-                                <input id="fileInput" type="file" name="file" placeholder="Photo" required=""
-                                    capture>
-                                <button class="btn btn-outline-primary" id="profileImage">Add profile pic</button>    
-                                <button class="btn btn-outline-primary">Edit profile</button>
+                                    <input id="fileInput" type="file" name="file" placeholder="Photo" required=""
+                                        capture>
+                                    <button class="btn btn-outline-primary" id="profileImage">Add profile pic</button>
+                                    <button class="btn btn-outline-primary">Edit profile</button>
                                 </form>
                             </div>
                         </div>
@@ -113,7 +112,7 @@
                             </div>
                         </div>
                         <hr>
-                        <div class="row">
+                        {{!-- <div class="row">
                             <div class="col-sm-3">
                                 <h6 class="mb-0">Phone</h6>
                             </div>
@@ -138,33 +137,53 @@
                             <div class="col-sm-9 text-secondary">
                                 Bay Area, San Francisco, CA
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
+            </div>
+            <div class="container">
+                <h2>Saved addresses</h2>
+                <p></p>
+                <div class="card">
+                {{#each address}}
+                    <div class="card-body">
+                        {{!-- <h4 class="card-title">Card title</h4> --}}
+                        <p class="card-text">Name: <span>{{this.name}}</span></p><br>
+                        <p class="card-text">Email: <span>{{this.email}}</span></p><br>
+                        <p class="card-text">Address: <span>{{this.address}}</span></p><br>
+                        <p class="card-text">Phone: <span>{{this.phone}}</span></p><br>
+                        <p class="card-text">Pin: <span>{{this.pin}}</span></p><br>
+                        <a href="#" class="card-link">Edit Address</a>
+                        <a href="#" class="card-link">Remove</a>
+                        <hr>
+                    </div>
+                {{/each}}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Crop Image</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+                <h5 class="modal-title" id="exampleModalLongTitle">Crop Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <canvas id="canvas">
                     Your browser does not support the HTML5 canvas element.
-                  </canvas>
+                </canvas>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" id="btnCrop" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="btnCrop" class="btn btn-primary">Save changes</button>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
+</div>

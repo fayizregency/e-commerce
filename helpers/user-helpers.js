@@ -335,13 +335,13 @@ module.exports = {
         });
     });
   },
-  removeCart:(userId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(userId)}).then(()=>{
-        resolve();
-      })
-    })
-  },
+  // removeCart:(userId)=>{
+  //   return new Promise((resolve,reject)=>{
+  //     db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(userId)}).then(()=>{
+  //       resolve();
+  //     })
+  //   })
+  // },
   getOrderTotal: (orderId) => {
     return new Promise(async (resolve, reject) => {
       let total = await db
@@ -577,6 +577,7 @@ module.exports = {
       db.get().collection(collection.ADDRESS_COLLECTION).insertOne(
         {
           name:data.name,
+          email:data.email,
           address:data.address,
           phone:data.phone,
           pin:data.pin,
@@ -586,5 +587,26 @@ module.exports = {
         resolve();
       })
     })
-  }
+  },
+  getUserAddress:(userId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ADDRESS_COLLECTION).find({userId:objId(userId)}).toArray().then((address)=>{
+        resolve(address);
+      })
+    })
+  },
+  getOneAddress:(addressId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ADDRESS_COLLECTION).findOne({_id:objId(addressId)}).then((address)=>{
+        resolve(address);
+      })
+    })
+  },
+  getTotalNoOfUsers:()=>{
+    return new Promise((resolve,reject)=>{
+        db.get().collection(collection.USER_COLLECTION).estimatedDocumentCount().then((count)=>{
+            resolve(count);
+        })
+    })
+}
 };
