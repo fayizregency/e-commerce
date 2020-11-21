@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
+const { default: orderId } = require("order-id");
 var instance = new Razorpay({
   key_id: "rzp_test_6jhrsB3r51nyzO",
   key_secret: "YONdL0Kt8yh9YTlGGX6Dn2eM",
@@ -311,7 +312,7 @@ module.exports = {
   },
   placeOrder: (data, products, totalPrice) => {
     return new Promise((resolve, reject) => {
-      let status = data.paymentMethod === "COD" ? "placed" : "pending";
+      let status = data.paymentMethod === "COD" ? "Not paid" : "Pending";
       let orderObj = {
         deliveryDetails: {
           name: data.name,
@@ -323,7 +324,8 @@ module.exports = {
         paymentMethod: data.paymentMethod,
         amount: totalPrice,
         products: products,
-        status: status,
+        payment_status: status,
+        shipment_status:"Not shipped",
         date: new Date(),
       };
       db.get()
@@ -335,13 +337,13 @@ module.exports = {
         });
     });
   },
-  // removeCart:(userId)=>{
-  //   return new Promise((resolve,reject)=>{
-  //     db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(userId)}).then(()=>{
-  //       resolve();
-  //     })
-  //   })
-  // },
+  removeCart:(userId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(userId)}).then(()=>{
+        resolve();
+      })
+    })
+  },
   getOrderTotal: (orderId) => {
     return new Promise(async (resolve, reject) => {
       let total = await db
@@ -439,6 +441,13 @@ module.exports = {
       resolve(order);
     });
   },
+  getUserOrders:(userId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ORDER_COLLECTION).find({userId:objId(userId)}).toArray().then((response)=>{
+        resolve(response);
+      })
+    })
+  },
   getOrderProducts: (orderId) => {
     return new Promise(async (resolve, reject) => {
       let orderProducts = await db
@@ -532,13 +541,14 @@ module.exports = {
   generateRazorpay: (orderId, total) => {
     return new Promise((resolve, reject) => {
       var options = {
-        amount: total*100, // amount in the smallest currency unit
+        amount: total, // amount in the smallest currency unit
         currency: "INR",
         receipt: "" + orderId,
       };
       instance.orders.create(options, function (err, order) {
         if (err) {
           console.log(err);
+          reject(err);
         } else {
           console.log(order);
           resolve(order);
@@ -565,7 +575,7 @@ module.exports = {
       db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objId(orderId)},
       {
         $set:{
-          status:'placed'
+          payment_status:'Paid'
         }
       }).then(()=>{
         resolve();
@@ -608,5 +618,29 @@ module.exports = {
             resolve(count);
         })
     })
-}
+  },
+  cancelOrder:(orderId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objId(orderId)},
+      {
+        $set:{
+          shipment_status:"Order cancelled"
+        }
+      }).then(()=>{
+        resolve();
+      })
+    })
+  },
+  shipOrder:(orderId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objId(orderId)},
+      {
+        $set:{
+          shipment_status:"Order shipped"
+        }
+      }).then(()=>{
+        resolve();
+      })
+    })
+  }
 };

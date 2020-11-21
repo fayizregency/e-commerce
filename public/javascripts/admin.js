@@ -108,4 +108,10 @@ function dataURLtoFile(dataurl, filename) {
   }
   
   return new File([u8arr], filename, {type:mime});
-}
+};
+
+function showTick(orderId){
+  $('#confirm-id-'+orderId).hide();
+  $('#tick-id-'+orderId).show();
+  $("#cancel-btn-" + orderId).prop("disabled", true);
+};

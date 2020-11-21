@@ -174,7 +174,11 @@ $("#checkout-form").submit((e) => {
         location.href = `/orderSummary/${id}`;
       } else if (response.online) {
         console.log(response.online);
+        if(response.online){
         razorpayPayment(response.online);
+        }else{
+          alert('payment failed')
+        }
       } else if (response.paypal) {
         // document.getElementById('checkout-id').style.display= none;
         document.querySelector("#place-order-id").style.display = "none";
@@ -189,7 +193,7 @@ $("#checkout-form").submit((e) => {
 function razorpayPayment(order) {
   var options = {
     key: "rzp_test_6jhrsB3r51nyzO", // Enter the Key ID generated from the Dashboard
-    amount: order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    amount: order.amount *100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
     currency: "INR",
     name: "HourSpy",
     description: "Test Transaction",
@@ -199,8 +203,8 @@ function razorpayPayment(order) {
       verifyPayment(response, order);
     },
     prefill: {
-      name: "Gaurav Kumar",
-      email: "gaurav.kumar@example.com",
+      name: "Fayis kv",
+      email: "faizy@example.com",
       contact: "9999999999",
     },
     notes: {

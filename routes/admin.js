@@ -7,7 +7,8 @@ var userHelpers = require("../helpers/user-helpers");
 const date = require('date-and-time');
 const pattern = date.compile("ddd, MMM DD YYYY");
 var base64ToImage = require('base64-to-image');
-const numWords = require('num-words')
+const numWords = require('num-words');
+const { route } = require("./user");
 // var fs=require('fs');
 /* GET users listing. */
 
@@ -48,7 +49,7 @@ router.post("/login", (req, res) => {
   }
 });
 
-router.get("/orders", verifyAdmin, function (req, res, next) {
+router.get("/orders", function (req, res, next) {
   userHelpers.getAllOrders().then((orders)=>{
     orders.forEach(element => {
       element.date=date.format(element.date, pattern);
@@ -56,6 +57,20 @@ router.get("/orders", verifyAdmin, function (req, res, next) {
     res.render("admin/orders", { admin: true, orders });
   })
 });
+
+router.get('/cancelOrder/:id', (req,res)=>{
+  let order_id=req.params.id;
+  userHelpers.cancelOrder(order_id).then(()=>{
+    res.redirect('/admin/orders');
+  }) 
+});
+
+router.get('/shipOrder/:id',(req,res)=>{
+  let order_id=req.params.id;
+  userHelpers.shipOrder(order_id).then(()=>{
+    res.redirect('/admin/orders');
+  })
+})
 
 router.get("/products", verifyAdmin, function (req, res, next) {
   productHelpers.getProduct().then((products) => {
