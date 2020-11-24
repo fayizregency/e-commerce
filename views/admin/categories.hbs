@@ -11,23 +11,22 @@
           </div>
 
           <div class="table-responsive">
-            <table class="table table-striped table-sm" id="myTable">
+            <table class="table  table-sm" id="myTable">
               <thead>
                 <tr>
-                  <th>sl.no</th>
+                  
                   <th>Categories</th>
-                  <th>Products</th>
+                  <th>Edit</th>
                   <th>Delete</th>
                 </tr>
               </thead>
               <tbody>
                 {{#each category}}
                 <tr>
-                  <td>{{@index}}</td>
+                  
                   <td>{{this.category}}</td>
-                  <th></th>
-                  <td></td>
-                  <th><button class="btn btn-primary">confirm</button></th>
+                  <td> <button class="btn btn-light">Edit</button></td>
+                  <td><button class="btn btn-danger">Delete</button></th>
                 </tr>
                 {{/each}}
                 
@@ -37,4 +36,10 @@
         </main>
       </div>
 
+
+<!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
       

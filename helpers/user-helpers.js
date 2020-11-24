@@ -6,6 +6,7 @@ const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
 const { default: orderId } = require("order-id");
+
 var instance = new Razorpay({
   key_id: "rzp_test_6jhrsB3r51nyzO",
   key_secret: "YONdL0Kt8yh9YTlGGX6Dn2eM",
@@ -209,7 +210,11 @@ module.exports = {
           },
         ])
         .toArray();
-      resolve(cartItems);
+        if(cartItems){
+          resolve(cartItems);
+        }else{
+          reject();
+        }
     });
   },
   getCartCount: (userId) => {
@@ -332,7 +337,7 @@ module.exports = {
         .collection(collection.ORDER_COLLECTION)
         .insertOne(orderObj)
         .then((response) => {
-          db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(data.userId)});
+          // db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(data.userId)});
           resolve({id:response.ops[0]._id, amount:response.ops[0].amount});
         });
     });
@@ -589,7 +594,7 @@ module.exports = {
           name:data.name,
           email:data.email,
           address:data.address,
-          phone:data.phone,
+          phone:data.mobile,
           pin:data.pin,
           userId:objId(data.userId)
         }
@@ -609,6 +614,13 @@ module.exports = {
     return new Promise((resolve,reject)=>{
       db.get().collection(collection.ADDRESS_COLLECTION).findOne({_id:objId(addressId)}).then((address)=>{
         resolve(address);
+      })
+    })
+  },
+  removeOneAddress:(id)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ADDRESS_COLLECTION).removeOne({_id:objId(id)}).then(()=>{
+        resolve();
       })
     })
   },

@@ -128,8 +128,6 @@ function disableMinus(prodId) {
   }
 }
 
-// $(document).ready(function () {});
-
 // remove one cart prodect
 function removeCart(cartId, prodId) {
   if (confirm("Are you sure?")) {
@@ -148,52 +146,58 @@ function removeCart(cartId, prodId) {
     });
   }
 }
-//**************** */ order checkout
+//*****************/ order checkout
 $("#checkout-form").submit((e) => {
   e.preventDefault();
-  var myform = document.getElementById("checkout-form");
-  var fd = new FormData(myform);
-  let checked = false;
-  if ($("#defaultCheck1").is(":checked")) {
-    checked = true;
-  } else {
-    checked = false;
-  }
-  fd.append("checked", checked);
-  $.ajax({
-    url: "/placeOrder",
-    method: "post",
-    data: fd,
-    cache: false,
-    processData: false,
-    contentType: false,
-    success: (response) => {
-      if (response.cod) {
-        console.log(response.cod);
-        let id = response.cod;
-        location.href = `/orderSummary/${id}`;
-      } else if (response.online) {
-        console.log(response.online);
-        if(response.online){
-        razorpayPayment(response.online);
-        }else{
-          alert('payment failed')
+  if ($("#checkout-form").valid()) {
+    var myform = document.getElementById("checkout-form");
+    var fd = new FormData(myform);
+    let checked = false;
+    if ($("#defaultCheck1").is(":checked")) {
+      checked = true;
+    } else {
+      checked = false;
+    }
+    fd.append("checked", checked);
+    $.ajax({
+      url: "/placeOrder",
+      method: "post",
+      data: fd,
+      cache: false,
+      processData: false,
+      contentType: false,
+      success: (response) => {
+        if (response.cod) {
+          console.log(response.cod);
+          let id = response.cod;
+          location.href = `/orderSummary/${id}`;
+        } else if (response.online) {
+          console.log(response.online);
+          if (response.online) {
+            razorpayPayment(response.online);
+          } else {
+            alert("payment failed");
+          }
+        } else if (response.paypal) {
+          // document.getElementById('checkout-id').style.display= none;
+          document.querySelector("#place-order-id").style.display = "none";
+          $('#cod').hide();
+          $('#online').hide();
+          let id = response.paypal.id;
+          let amount = response.paypal.amount;
+          paypalPayment(id, amount);
         }
-      } else if (response.paypal) {
-        // document.getElementById('checkout-id').style.display= none;
-        document.querySelector("#place-order-id").style.display = "none";
-        let id = response.paypal.id;
-        let amount = response.paypal.amount;
-        paypalPayment(id, amount);
-      }
-    },
-  });
+      },
+    });
+  }
 });
+//*****************/end of order checkout
+
 // ******************* razorpay payment ***********//
 function razorpayPayment(order) {
   var options = {
     key: "rzp_test_6jhrsB3r51nyzO", // Enter the Key ID generated from the Dashboard
-    amount: order.amount *100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    amount: order.amount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
     currency: "INR",
     name: "HourSpy",
     description: "Test Transaction",
@@ -274,7 +278,6 @@ function paypalPayment(orderId, amount) {
 
 function verifyPaypal(orderId) {
   console.log(orderId);
-  console.log("breeewwwww");
   $.ajax({
     url: "/verifyPaypal",
     method: "post",

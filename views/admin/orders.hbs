@@ -1,53 +1,79 @@
 <style>
-  #myTable_wrapper .row{
+  #myTable_wrapper .row {
     margin-right: 0px;
     margin-left: 0px;
-}
+  }
 </style>
 <link rel="stylesheet" href="//cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 <div class="container-fluid">
-     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Orders</h1>
-          </div>
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+      <h1 class="h2">Orders</h1>
+    </div>
 
-          <div class="table-responsive">
-            <table class="table  table-sm" id="myTable">
-              <thead>
-                <tr>
-                  <th>customer</th>
-                  <th>phone</th>
-                  <th>Address</th>
-                  <th>order id</th>
-                  <th>order date</th>
-                  <th>payment method</th>
-                  <th>payment status</th>
-                  <th>shipment status</th>
-                  <th>ship order</th>
-                  <th>Cancel</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{#each orders}}
-                <tr>
-                  <td>{{this.deliveryDetails.name}}</td>
-                  <td>{{this.deliveryDetails.phone}}</td>
-                  <th>{{this.deliveryDetails.address}}</th>
-                  <td>{{this._id}}</td>
-                  <td>{{this.date}}</td>
-                  <td>{{this.paymentMethod}}</td>
-                  <td>{{this.payment_status}}</td>
-                  <td>{{this.shipment_status}}</td>
-                  <th >
-                    <a id="confirm-id-{{this._id}}" href="/admin/shipOrder/{{this._id}}" onclick="showTick('{{this._id}}')" class="btn btn-primary">confirm</a>
-                    <button id='tick-id-{{this._id}}' style="display: none;"><img src="https://img.icons8.com/color/48/000000/checked--v1.png"/></button>
-                  </th>
-                  <th><a href="/admin/cancelOrder/{{this._id}}" id="cancel-btn-{{this._id}}" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?')">cancel</a></th>
-                </tr>
-                {{/each}}
-                
-              </tbody>
-            </table>
-          </div>
-        </main>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-bordered table-sm" id="myTable">
+        <thead>
+          <tr>
+            <th>customer</th>
+            <th>phone</th>
+            <th>Address</th>
+            <th>order id</th>
+            <th>order date</th>
+            <th>payment method</th>
+            <th>payment status</th>
+            <th>shipment status</th>
+            <th>ship order</th>
+            <th>Cancel</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each orders}}
+          <tr>
+            <td>{{this.deliveryDetails.name}}</td>
+            <td>{{this.deliveryDetails.phone}}</td>
+            <th>{{this.deliveryDetails.address}}</th>
+            <td>{{this._id}}</td>
+            <td>{{this.date}}</td>
+            <td>{{this.paymentMethod}}</td>
+            <td>{{this.payment_status}}</td>
+            <td>{{this.shipment_status}}</td>
+            <th>
+              <a id="confirm-id-{{this._id}}" href="/admin/shipOrder/{{this._id}}" onclick="showTick('{{this._id}}')"
+                class="btn btn-primary">confirm</a>
+              <button id='tick-id-{{this._id}}' style="display: none; border:none;"><img src="https://img.icons8.com/color/50/000000/double-tick.png"/></button>
+            </th>
+            <th><a href="/admin/cancelOrder/{{this._id}}" id="cancel-btn-{{this._id}}" class="btn btn-danger"
+                onclick="return confirm('Are you sure you want to cancel this order?')">cancel</a></th>
+          </tr>
+          {{/each}}
+
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script>
+  $(document).ready(function () {
+    $.ajax({
+      url: '/admin/ajax/orders',
+      method: 'get',
+      success: (response) => {
+        // alert(response)
+        response.orders.forEach(element => {
+          if (element.shipment_status == "Order shipped") {
+            orderId = element._id
+            $('#confirm-id-' + orderId).hide();
+            $('#tick-id-' + orderId).show();
+            $("#cancel-btn-" + orderId).prop("disabled", true);
+          }
+        })
+      }
+    })
+  }) 
+</script>
+<!-- Icons -->
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>

@@ -4,6 +4,7 @@ const { response } = require("../app");
 var router = express.Router();
 var productHelpers = require("../helpers/product-helpers");
 var userHelpers = require("../helpers/user-helpers");
+var adminHelpers= require('../helpers/admin-helpers');
 const date = require('date-and-time');
 const pattern = date.compile("ddd, MMM DD YYYY");
 var base64ToImage = require('base64-to-image');
@@ -13,11 +14,11 @@ const { route } = require("./user");
 /* GET users listing. */
 
 const verifyAdmin = (req, res, next) => {
-  if (req.session.admin) {
+  // if (req.session.admin) {
     next();
-  } else {
-    res.redirect("/admin/login");
-  }
+  // } else {
+  //   res.redirect("/admin/login");
+  // }
 };
 
 router.get("/", function (req, res, next) {
@@ -57,6 +58,12 @@ router.get("/orders", function (req, res, next) {
     res.render("admin/orders", { admin: true, orders });
   })
 });
+
+router.get('/ajax/orders', (req,res)=>{
+  userHelpers.getAllOrders().then((orders)=>{
+    res.json({orders:orders});
+  })
+})
 
 router.get('/cancelOrder/:id', (req,res)=>{
   let order_id=req.params.id;
@@ -188,6 +195,11 @@ router.get('/reports', async (req,res)=>{
   res.render('admin/reports',{admin:true , product_count, user_count ,userInWords, productInWords});
 });
 
+router.post('/ajax/reports', async(req,res)=>{
+  let orders=await adminHelpers.getOrderReport(req.body);
+  // let amount=await userHelpers.get
+  res.json({"orders":orders});
+})
 
 router.get("/signout", (req, res) => {
   req.session.admin = null;

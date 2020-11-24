@@ -5,6 +5,7 @@ var userHelpers = require("../helpers/user-helpers");
 var productHelpers = require("../helpers/product-helpers");
 const nocache = require("node-nocache/nocache");
 const date = require("date-and-time");
+const { route } = require("../app");
 const pattern = date.compile("ddd, MMM DD YYYY");
 // const orderid = require('order-id')('mysecret');
 /* GET home page. */
@@ -124,50 +125,67 @@ router.post("/changeQty", (req, res) => {
     res.json(totalPrice);
   });
 });
+
 router.post("/removeCart", (req, res) => {
   userHelpers.removeOneCartItem(req.body).then((response) => {
     res.json(response);
   });
 });
+
 router.get("/checkout", verifyUser, async (req, res) => {
   let address = await userHelpers.getUserAddress(req.session.userId);
-  userHelpers.getCart(req.session.userId).then(async (products) => {
-    let cartCount = await userHelpers.getCartCount(req.session.userId);
-    let totalPrice = await userHelpers.getTotalPrice(req.session.userId);
-    res.render("user/checkout", {
-      user: req.session.user,
-      products,
-      totalPrice,
-      cartCount,
-      address,
+  userHelpers
+    .getCart(req.session.userId)
+    .then(async (products) => {
+      let cartCount = await userHelpers.getCartCount(req.session.userId);
+      let totalPrice = await userHelpers.getTotalPrice(req.session.userId);
+      res.render("user/checkout", {
+        user: req.session.user,
+        products,
+        totalPrice,
+        cartCount,
+        address,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send("oops ..page not found -404");
     });
-  });
 });
+
 router.post("/placeOrder", async (req, res) => {
-  console.log(req.body);
+  
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
-  userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
-    if (req.body.paymentMethod === "COD") {
+
+  if (req.body.paymentMethod === "COD") {
+    userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
+      userHelpers.removeCart(req.session.userId);
       res.json({ cod: response.id });
-    } else if (req.body.paymentMethod === "Razorpay") {
+    });
+  } else if (req.body.paymentMethod === "Razorpay") {
+    userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
       userHelpers
         .generateRazorpay(response.id, response.amount)
         .then((razorpay) => {
+          userHelpers.removeCart(req.session.userId);
           res.json({ online: razorpay });
         })
         .catch((err) => {
           res.json({ online: false });
         });
-    } else if (req.body.paymentMethod === "paypal") {
+    });
+  } else if (req.body.paymentMethod === "paypal") {
+    userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
+      userHelpers.removeCart(req.session.userId);
       res.json({
         paypal: {
           id: response.id,
           amount: response.amount,
         },
       });
-    }
-  });
+    });
+  }
 
   if (req.body.checked == "true") {
     //**********saving user address ***********//
@@ -177,6 +195,7 @@ router.post("/placeOrder", async (req, res) => {
     });
   }
 });
+
 router.post("/verifyPayment", (req, res) => {
   let orderId = req.body["order[receipt]"];
   userHelpers
@@ -199,7 +218,7 @@ router.post("/verifyPaypal/", verifyUser, async (req, res) => {
   });
 });
 
-router.get("/orderSummary/:id", verifyUser, async (req, res) => {
+router.get("/orderSummary/:id",nocache, verifyUser, async (req, res) => {
   let id = req.params.id;
   let products = await userHelpers.getOrderProducts(id);
   let total = await userHelpers.getOrderTotal(id);
@@ -265,6 +284,13 @@ router.post("/useAddress", async (req, res) => {
   let address = await userHelpers.getOneAddress(addressId);
   res.json({ address: address });
 });
+
+router.get('/removeAddress/:id',(req,res)=>{
+  let address_id= req.params.id;
+  userHelpers.removeOneAddress(address_id).then(()=>{
+    res.redirect('/profile');
+  })
+})
 
 router.get("/getCategory/:category", async (req, res) => {
   let category = req.params.category;

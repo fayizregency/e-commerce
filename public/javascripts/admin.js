@@ -1,13 +1,11 @@
-$(document).ready(function(){
-    $('[data-toggle="offcanvas"]').click(function(){
-        $("#navigation").toggleClass("hidden-xs");
-    });
- });
 
- // Material Design | product table
- $(document).ready(function() {
-    $('#myTable').DataTable();
-} );
+// $(document).ready(function(){
+//     $('[data-toggle="offcanvas"]').click(function(){
+//         $("#navigation").toggleClass("hidden-xs");
+//     });
+//     $('#myTable').DataTable();
+//  });
+
 
 // validation when admin add user 
 $("#addUser").click(function () {
@@ -110,8 +108,6 @@ function dataURLtoFile(dataurl, filename) {
   return new File([u8arr], filename, {type:mime});
 };
 
-function showTick(orderId){
-  $('#confirm-id-'+orderId).hide();
-  $('#tick-id-'+orderId).show();
-  $("#cancel-btn-" + orderId).prop("disabled", true);
-};
+// --------------admin report management 
+
+//-------------end of  admin report management 

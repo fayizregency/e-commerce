@@ -155,7 +155,7 @@
                         <p class="card-text">Phone: <span>{{this.phone}}</span></p><br>
                         <p class="card-text">Pin: <span>{{this.pin}}</span></p><br>
                         <a href="#" class="card-link">Edit Address</a>
-                        <a href="#" class="card-link">Remove</a>
+                        <a href="/removeAddress/{{this._id}}" onclick="return confirm('you want to remove this address ?')" class="card-link">Remove</a>
                         <hr>
                     </div>
                 {{/each}}
