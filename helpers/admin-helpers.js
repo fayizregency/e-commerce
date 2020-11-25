@@ -10,17 +10,6 @@ module.exports = {
       let startDate = date.startDate;
       let endDate = date.endDate;
       console.log(startDate + "\n" + endDate);
-
-        // db.get().collection(collection.ORDER_COLLECTION).find({
-        //   date:{
-        //     $gte:ISODate(startDate),
-        //     $lte:ISODate(endDate)
-        //   }
-        // }).toArray().then((response)=>{
-        //   console.log(response);
-        //   resolve(response)
-        // })
-
       db.get()
         .collection(collection.ORDER_COLLECTION)
         .aggregate([
@@ -29,6 +18,8 @@ module.exports = {
               date: {
                 $dateToString: { date: "$date", format: "%Y-%m-%d" },
               },
+              products: 1,
+              amount: 1,
             },
           },
           {
@@ -39,35 +30,98 @@ module.exports = {
               },
             },
           },
-          // {
-          //   $project:{
-          //     amount:"amount"
-          //   }
-          // },
           {
-            $group:{
-              _id:null,
-              total_orders:{
-                $sum:1
+            $group: {
+              _id: date,
+              total_orders: {
+                $sum: 1,
               },
-              total_amount:{
-                $sum:"$amount"
-              }
-          }
-        }
+              total_amount: {
+                $sum: "$amount",
+              },
+              total_products: {
+                $sum: { $size: "$products" },
+              },
+            },
+          },
         ])
         .toArray()
         .then((response) => {
-          console.log(response);
-          resolve();
+          resolve(response[0]);
         });
     });
   },
+  lastWeekOrder: () => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
 
-  lastWeekOrder:(week)=>{
+        .aggregate([
+          {
+            $match: {
+              date: { $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000) },
+            },
+          },
+
+          {
+            $project: {
+              _id: 1,
+              date: 1,
+              amount: 1,
+            },
+          },
+          {
+            $group: {
+              _id: {
+                month: { $month: "$date" },
+                day: { $dayOfMonth: "$date" },
+                year: { $year: "$date" },
+              },
+              amount: { $sum: { $multiply: ["$amount", 1] } },
+              count: { $sum: 1 },
+            },
+          },
+        ])
+
+        .toArray()
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+  getLastWeek: (key) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+
+        .aggregate([
+          {
+            $match: {
+              date: { $gte: new Date(new Date() - key * 60 * 60 * 24 * 1000) },
+            }
+          }
+        ])
+
+        .toArray()
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+  getCancelOrders:()=>{
     return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).find({date:{$gte:week}}).toArray().then((response)=>{
-        resolve(response);
+      db.get().collection(collection.ORDER_COLLECTION).find({shipment_status:"Order cancelled"}).toArray().then((orders)=>{
+        resolve(orders);
+      })
+    })
+  },
+  blockUser:(id)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.USER_COLLECTION).updateOne({_id:objId(id)},
+      {
+        $set:{
+          blocked:true
+        }
       })
     })
   }

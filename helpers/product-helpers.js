@@ -3,6 +3,7 @@ var collection = require("../config/collections");
 const { response } = require("express");
 const { promises } = require("fs");
 const { resolve } = require("path");
+const { count } = require("console");
 var objId = require("mongodb").ObjectID;
 module.exports = {
   addProduct: (product) => {
@@ -170,4 +171,11 @@ module.exports = {
         });
     });
   },
+  getTotalNoOfCategory:()=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.CATEGORY_COLLECTION).estimatedDocumentCount().then((count)=>{
+        resolve(count);
+      })
+    })
+  }
 };

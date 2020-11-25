@@ -82,7 +82,8 @@
           </div>
           {{/each}}
         <hr>
-          <button class="btn btn-dark" id="form-hide-btn" onclick="showForm()" style="display: none;">Deliver To Another address</button>
+          <button class="btn btn-sm" style="background-color: #abb;display: none;" id="form-hide-btn" onclick="showForm()">Deliver To Another address</button>
+        <hr>
         <form class="needs-validation" id="checkout-form" novalidate>
           <div id="form-hide-div">
           <div class="row">
@@ -161,11 +162,4 @@
     </div>
 
   </div>
-<script src = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script>
-      $(document).ready(function() {
-         function disablePrev() { window.history.forward() }
-         window.onload = disablePrev();
-         window.onpageshow = function(evt) { if (evt.persisted) disableBack() }
-      });
-   </script>
+

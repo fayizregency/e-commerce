@@ -257,7 +257,6 @@ router.get("/myOrders", verifyUser, async (req, res) => {
 router.get("/viewOrderProducts/:id", (req, res) => {
   let order_id = req.params.id;
   userHelpers.getOrderProducts(order_id).then((products) => {
-    console.log(products);
     res.render("user/order-products", { user: req.session.user, products });
   });
 });
@@ -306,7 +305,6 @@ router.post('/addNewAddress',(req,res)=>{
 });
 
 router.post('/editAddress', (req,res)=>{
-  console.log(req.body.id);
   userHelpers.getOneAddress(req.body.id).then((address)=>{
     res.json({"address":address});
   })

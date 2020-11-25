@@ -32,6 +32,7 @@ module.exports = {
                 lastName: userData.lname,
                 email: userData.email,
                 password: userData.pass1,
+                blocked:false
               })
               .then(() => {
                 resolve({ status: true });
