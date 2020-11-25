@@ -264,13 +264,13 @@ router.get("/viewOrderProducts/:id", (req, res) => {
 
 router.get("/profile", verifyUser, async (req, res) => {
   let address = await userHelpers.getUserAddress(req.session.userId);
-  console.log(address);
   userHelpers.getOneUser(req.session.userId).then((profile) => {
     profile.firstName = profile.firstName.toUpperCase();
     profile.lastName = profile.lastName.toUpperCase();
     res.render("user/profile", { user: req.session.user, profile, address });
   });
 });
+
 router.post("/addProfilePic", (req, res) => {
   let id = req.session.userId;
   let image = req.files.file;
@@ -278,6 +278,12 @@ router.post("/addProfilePic", (req, res) => {
   image.mv("./public/user-images/" + id + ".jpg");
   res.json("response");
 });
+
+router.post('/editProfile',(req,res)=>{
+  userHelpers.editUser(req.session.userId,req.body).then(()=>{
+    res.redirect('/profile');
+  })
+})
 
 router.post("/useAddress", async (req, res) => {
   let addressId = req.body.id;
@@ -288,6 +294,26 @@ router.post("/useAddress", async (req, res) => {
 router.get('/removeAddress/:id',(req,res)=>{
   let address_id= req.params.id;
   userHelpers.removeOneAddress(address_id).then(()=>{
+    res.redirect('/profile');
+  })
+});
+
+router.post('/addNewAddress',(req,res)=>{
+  userHelpers.saveAdress(req.body).then(() => {
+    console.log("address saved");
+    res.redirect('/profile');
+  });
+});
+
+router.post('/editAddress', (req,res)=>{
+  console.log(req.body.id);
+  userHelpers.getOneAddress(req.body.id).then((address)=>{
+    res.json({"address":address});
+  })
+})
+
+router.post('/updateAddress', (req,res)=>{
+  userHelpers.editAddress(req.body).then(()=>{
     res.redirect('/profile');
   })
 })

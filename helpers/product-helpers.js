@@ -107,12 +107,67 @@ module.exports = {
         });
     });
   },
-  getTotalNumberOfProducts:()=>{
-      return new Promise((resolve,reject)=>{
-          db.get().collection(collection.PRODUCT_COLLECTION).estimatedDocumentCount().then((count)=>{
-              console.log(count);
-              resolve(count);
-          })
-      })
-  }
+  getOneCategoryDocument: (id) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.CATEGORY_COLLECTION)
+        .findOne({ _id: objId(id) })
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+  editOneCategory: (category, data) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.CATEGORY_COLLECTION)
+        .updateOne(
+          { category: category },
+          {
+            $set: { category: data.category },
+          }
+        )
+        .then(() => {
+          db.get()
+            .collection(collection.PRODUCT_COLLECTION)
+            .updateMany(
+              { category: category },
+              {
+                $set: {
+                  category: data.category,
+                },
+              }
+            )
+            .then((response) => {
+              resolve();
+            });
+        });
+    });
+  },
+  getTotalNumberOfProducts: () => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.PRODUCT_COLLECTION)
+        .estimatedDocumentCount()
+        .then((count) => {
+          console.log(count);
+          resolve(count);
+        });
+    });
+  },
+  deleteCategory: (category) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.PRODUCT_COLLECTION)
+        .remove({ category: category })
+        .then(() => {
+          db.get()
+            .collection(collection.CATEGORY_COLLECTION)
+            .removeOne({ category: category })
+            .then(() => {
+              resolve();
+            });
+        });
+    });
+  },
 };

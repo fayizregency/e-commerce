@@ -21,12 +21,17 @@ const verifyAdmin = (req, res, next) => {
   // }
 };
 
-router.get("/", function (req, res, next) {
+router.get("/", async function (req, res, next) {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
   res.setHeader("Pragma", "no-cache"); // HTTP 1.0.
   res.setHeader("Expires", "0"); // Proxies.
+  let mydate=new Date();
+  let week=date.addDays(mydate, -7) 
   if (req.session.admin) {
-    res.render("admin/dash", { admin: true });
+    let orders=await adminHelpers.lastWeekOrder(week);
+
+    console.log(orders);
+    res.render("admin/dash", { admin: true ,orders});
   } else {
     res.redirect("/admin/login");
   }
@@ -141,6 +146,27 @@ router.post('/addCategory',(req,res)=>{
     res.redirect('/admin/category');
   })
 });
+
+router.get('/deleteCategory/:category',(req,res)=>{
+ let category=req.params.category;
+ productHelpers.deleteCategory(category).then(()=>{
+   res.redirect('/admin/category');
+ })
+});
+
+router.get('/editCategory/:id',(req,res)=>{
+  let id=req.params.id;
+  productHelpers.getOneCategoryDocument(id).then((category)=>{
+    res.render('admin/edit-category',{admin:true, category});
+  })
+});
+
+router.post('/editCategory/:category',(req,res)=>{
+  let category=req.params.category;
+  productHelpers.editOneCategory(category,req.body).then(()=>{
+    res.redirect('/admin/category');
+  })
+})
 
 router.get("/users", verifyAdmin, function (req, res, next) {
   userHelpers.getUsers().then((users) => {

@@ -603,6 +603,23 @@ module.exports = {
       })
     })
   },
+  editAddress:(data)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ADDRESS_COLLECTION).updateOne({_id:objId(data.userId)},
+      {
+        $set:{
+          name:data.name,
+          email:data.email,
+          address:data.address,
+          phone:data.mobile,
+          pin:data.pin,
+          userId:objId(data.userId)
+        }
+      }).then(()=>{
+        resolve();
+      })
+    })
+  },
   getUserAddress:(userId)=>{
     return new Promise((resolve,reject)=>{
       db.get().collection(collection.ADDRESS_COLLECTION).find({userId:objId(userId)}).toArray().then((address)=>{
