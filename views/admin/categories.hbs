@@ -11,7 +11,7 @@
           </div>
 
           <div class="table-responsive">
-            <table class="table  table-sm" id="myTable">
+            <table class="table table-bordered table-xs" id="myTable">
               <thead>
                 <tr>
                   
@@ -25,7 +25,7 @@
                 <tr>
                   
                   <td>{{this.category}}</td>
-                  <td><a href="/admin/editCategory/{{this._id}}"><button class="btn btn-light">Edit</button></a></td>
+                  <td><a href="/admin/editCategory/{{this._id}}"><button class="btn btn-dark">Edit</button></a></td>
                   <td><a href="/admin/deleteCategory/{{this.category}}"><button onclick="return confirm('this will delete all products in this category')" class="btn btn-danger">Delete</button></a></th>
                 </tr>
                 {{/each}}

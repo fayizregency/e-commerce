@@ -9,7 +9,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       let startDate = date.startDate;
       let endDate = date.endDate;
-      console.log(startDate + "\n" + endDate);
+      // console.log(startDate + "\n" + endDate);
       db.get()
         .collection(collection.ORDER_COLLECTION)
         .aggregate([
@@ -98,8 +98,8 @@ module.exports = {
           {
             $match: {
               date: { $gte: new Date(new Date() - key * 60 * 60 * 24 * 1000) },
-            }
-          }
+            },
+          },
         ])
 
         .toArray()
@@ -108,21 +108,56 @@ module.exports = {
         });
     });
   },
-  getCancelOrders:()=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).find({shipment_status:"Order cancelled"}).toArray().then((orders)=>{
-        resolve(orders);
-      })
-    })
+  getCancelOrders: () => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .find({ shipment_status: "Order cancelled" })
+        .toArray()
+        .then((orders) => {
+          resolve(orders);
+        });
+    });
   },
-  blockUser:(id)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.USER_COLLECTION).updateOne({_id:objId(id)},
-      {
-        $set:{
-          blocked:true
-        }
-      })
-    })
-  }
+  blockUser: (id, key) => {
+    return new Promise((resolve, reject) => {
+      if (key === "block") {
+        db.get()
+          .collection(collection.USER_COLLECTION)
+          .updateOne(
+            { _id: objId(id) },
+            {
+              $set: {
+                blocked: true,
+              },
+            }
+          )
+          .then(() => {
+            resolve({blocked:true});
+          })
+          .catch((err) => {
+            console.log(err);
+            reject();
+          });
+      } else {
+        db.get()
+          .collection(collection.USER_COLLECTION)
+          .updateOne(
+            { _id: objId(id) },
+            {
+              $set: {
+                blocked: false,
+              },
+            }
+          )
+          .then(() => {
+            resolve({blocked:false});
+          })
+          .catch((err) => {
+            console.log(err);
+            reject();
+          });
+      }
+    });
+  },
 };

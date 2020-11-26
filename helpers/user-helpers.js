@@ -29,10 +29,10 @@ module.exports = {
               .collection(collection.USER_COLLECTION)
               .insertOne({
                 firstName: userData.fname,
-                lastName: userData.lname,
+                phone: userData.phone,
                 email: userData.email,
                 password: userData.pass1,
-                blocked:false
+                blocked: false,
               })
               .then(() => {
                 resolve({ status: true });
@@ -102,7 +102,7 @@ module.exports = {
           {
             $set: {
               firstName: userData.fname,
-              lastName: userData.lname,
+              phone: userData.phone,
               email: userData.email,
             },
           }
@@ -211,11 +211,11 @@ module.exports = {
           },
         ])
         .toArray();
-        if(cartItems){
-          resolve(cartItems);
-        }else{
-          reject();
-        }
+      if (cartItems) {
+        resolve(cartItems);
+      } else {
+        reject();
+      }
     });
   },
   getCartCount: (userId) => {
@@ -331,7 +331,7 @@ module.exports = {
         amount: totalPrice,
         products: products,
         payment_status: status,
-        shipment_status:"Not shipped",
+        shipment_status: "Not shipped",
         date: new Date(),
       };
       db.get()
@@ -339,16 +339,19 @@ module.exports = {
         .insertOne(orderObj)
         .then((response) => {
           // db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(data.userId)});
-          resolve({id:response.ops[0]._id, amount:response.ops[0].amount});
+          resolve({ id: response.ops[0]._id, amount: response.ops[0].amount });
         });
     });
   },
-  removeCart:(userId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.CART_COLLECTION).removeOne({user:objId(userId)}).then(()=>{
-        resolve();
-      })
-    })
+  removeCart: (userId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.CART_COLLECTION)
+        .removeOne({ user: objId(userId) })
+        .then(() => {
+          resolve();
+        });
+    });
   },
   getOrderTotal: (orderId) => {
     return new Promise(async (resolve, reject) => {
@@ -447,12 +450,16 @@ module.exports = {
       resolve(order);
     });
   },
-  getUserOrders:(userId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).find({userId:objId(userId)}).toArray().then((response)=>{
-        resolve(response);
-      })
-    })
+  getUserOrders: (userId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .find({ userId: objId(userId) })
+        .toArray()
+        .then((response) => {
+          resolve(response);
+        });
+    });
   },
   getOrderProducts: (orderId) => {
     return new Promise(async (resolve, reject) => {
@@ -567,110 +574,165 @@ module.exports = {
       const crypto = require("crypto");
       let hash = crypto
         .createHmac("sha256", "YONdL0Kt8yh9YTlGGX6Dn2eM")
-        .update(data['payment[razorpay_order_id]']+'|'+data['payment[razorpay_payment_id]'])
+        .update(
+          data["payment[razorpay_order_id]"] +
+            "|" +
+            data["payment[razorpay_payment_id]"]
+        )
         .digest("hex");
-        if (hash == data['payment[razorpay_signature]']) {
-          resolve();
-        }else{
-          reject();
-        }
+      if (hash == data["payment[razorpay_signature]"]) {
+        resolve();
+      } else {
+        reject();
+      }
     });
   },
-  changePaymentStatus:(orderId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objId(orderId)},
-      {
-        $set:{
-          payment_status:'Paid'
-        }
-      }).then(()=>{
-        resolve();
-      })
-    })
+  changePaymentStatus: (orderId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .updateOne(
+          { _id: objId(orderId) },
+          {
+            $set: {
+              payment_status: "Paid",
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
+    });
   },
-  saveAdress:(data)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ADDRESS_COLLECTION).insertOne(
-        {
-          name:data.name,
-          email:data.email,
-          address:data.address,
-          phone:data.mobile,
-          pin:data.pin,
-          userId:objId(data.userId)
-        }
-      ).then(()=>{
-        resolve();
-      })
-    })
-  },
-  editAddress:(data)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ADDRESS_COLLECTION).updateOne({_id:objId(data.userId)},
-      {
-        $set:{
-          name:data.name,
-          email:data.email,
-          address:data.address,
-          phone:data.mobile,
-          pin:data.pin,
-          userId:objId(data.userId)
-        }
-      }).then(()=>{
-        resolve();
-      })
-    })
-  },
-  getUserAddress:(userId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ADDRESS_COLLECTION).find({userId:objId(userId)}).toArray().then((address)=>{
-        resolve(address);
-      })
-    })
-  },
-  getOneAddress:(addressId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ADDRESS_COLLECTION).findOne({_id:objId(addressId)}).then((address)=>{
-        resolve(address);
-      })
-    })
-  },
-  removeOneAddress:(id)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ADDRESS_COLLECTION).removeOne({_id:objId(id)}).then(()=>{
-        resolve();
-      })
-    })
-  },
-  getTotalNoOfUsers:()=>{
-    return new Promise((resolve,reject)=>{
-        db.get().collection(collection.USER_COLLECTION).estimatedDocumentCount().then((count)=>{
-            resolve(count);
+  saveAdress: (data) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ADDRESS_COLLECTION)
+        .insertOne({
+          name: data.name,
+          email: data.email,
+          address: data.address,
+          phone: data.mobile,
+          pin: data.pin,
+          userId: objId(data.userId),
         })
-    })
+        .then(() => {
+          resolve();
+        });
+    });
   },
-  cancelOrder:(orderId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objId(orderId)},
-      {
-        $set:{
-          shipment_status:"Order cancelled"
-        }
-      }).then(()=>{
-        resolve();
-      })
-    })
+  editAddress: (data) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ADDRESS_COLLECTION)
+        .updateOne(
+          { _id: objId(data.userId) },
+          {
+            $set: {
+              name: data.name,
+              email: data.email,
+              address: data.address,
+              phone: data.mobile,
+              pin: data.pin,
+              userId: objId(data.userId),
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
+    });
   },
-  shipOrder:(orderId)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objId(orderId)},
-      {
-        $set:{
-          shipment_status:"Order shipped"
-        }
-      }).then(()=>{
-        resolve();
-      })
-    })
-  }
+  getUserAddress: (userId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ADDRESS_COLLECTION)
+        .find({ userId: objId(userId) })
+        .toArray()
+        .then((address) => {
+          resolve(address);
+        });
+    });
+  },
+  getOneAddress: (addressId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ADDRESS_COLLECTION)
+        .findOne({ _id: objId(addressId) })
+        .then((address) => {
+          resolve(address);
+        });
+    });
+  },
+  removeOneAddress: (id) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ADDRESS_COLLECTION)
+        .removeOne({ _id: objId(id) })
+        .then(() => {
+          resolve();
+        });
+    });
+  },
+  getTotalNoOfUsers: () => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.USER_COLLECTION)
+        .estimatedDocumentCount()
+        .then((count) => {
+          resolve(count);
+        });
+    });
+  },
+  cancelOrder: (orderId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .updateOne(
+          { _id: objId(orderId) },
+          {
+            $set: {
+              shipment_status: "Order cancelled",
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
+    });
+  },
+  shipOrder: (orderId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .updateOne(
+          { _id: objId(orderId) },
+          {
+            $set: {
+              shipment_status: "Order shipped",
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
+    });
+  },
+  checkMobile: (mobile) => {
+    let response = {};
+    return new Promise(async (resolve, reject) => {
+      let user = await db
+        .get()
+        .collection(collection.USER_COLLECTION)
+        .findOne({ phone: mobile });
+      if (user) {
+        response.user = user;
+        response.status = "valid";
+        resolve(response);
+      } else {
+        response.status = "invalid";
+        resolve(response);
+      }
+    });
+  },
 };

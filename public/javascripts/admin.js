@@ -1,10 +1,10 @@
 
-// $(document).ready(function(){
-//     $('[data-toggle="offcanvas"]').click(function(){
-//         $("#navigation").toggleClass("hidden-xs");
-//     });
-//     $('#myTable').DataTable();
-//  });
+$(document).ready(function(){
+    $('[data-toggle="offcanvas"]').click(function(){
+        $("#navigation").toggleClass("hidden-xs");
+    });
+    $('#myTable').DataTable();
+ });
 
 
 // validation when admin add user 
@@ -23,7 +23,7 @@ $("#addUser").click(function () {
     $.post("http://localhost:3000/admin/addUser",
         {
             fname: $('#name1').val(),
-            lname: $('#name2').val(),
+            phone: $('#name2').val(),
             email: $('#email').val(),
             pass1: $('#pass1').val(),
             pass2: $('#pass2').val()

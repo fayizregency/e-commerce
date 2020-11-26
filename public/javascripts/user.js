@@ -15,7 +15,7 @@ $("#signup").click(function () {
       "http://localhost:3000/signup",
       {
         fname: $("#name1").val(),
-        lname: $("#name2").val(),
+        phone: $("#name2").val(),
         email: $("#email").val(),
         pass1: $("#pass1").val(),
         pass2: $("#pass2").val(),
@@ -59,11 +59,19 @@ $("#signin").click(function () {
 
         if (data === "success") {
           document.location.href = "http://localhost:3000";
-        } else if (data === "missMatch") {
+        }else if(data==='blocked'){
           $(".empty").css("display", "none");
+          $(".noUser").css("display", "none");
+          $(".wrongPass").css("display", "none");
+          $(".blocked").css("display", "block");
+        }
+         else if (data === "missMatch") {
+          $(".empty").css("display", "none");
+          $(".blocked").css("display", "none");
           $(".noUser").css("display", "none");
           $(".wrongPass").css("display", "block");
         } else if (data === "noUser") {
+          $(".blocked").css("display", "none");
           $(".empty").css("display", "none");
           $(".wrongPass").css("display", "none");
           $(".noUser").css("display", "block");

@@ -27,23 +27,23 @@ router.get("/", async function (req, res, next) {
   res.setHeader("Expires", "0"); // Proxies.
 
   // if (req.session.admin) {
-      res.render("admin/dash", { admin: true });
+  res.render("admin/dash", { admin: true });
   // } else {
-    // res.redirect("/admin/login");
+  // res.redirect("/admin/login");
   // }
 });
 
-router.get('/ajax/graph',(req,res)=>{
-  let count=[];
-  var date=[];
-  adminHelpers.lastWeekOrder().then((weekly_reports)=>{    
-    weekly_reports.forEach((element)=>{
-      date.push(element._id.day)
-      count.push(element.count)  
-    })
-    res.json({ count:count,date:date });
+router.get("/ajax/graph", (req, res) => {
+  let count = [];
+  var date = [];
+  adminHelpers.lastWeekOrder().then((weekly_reports) => {
+    weekly_reports.forEach((element) => {
+      date.push(element._id.day);
+      count.push(element.count);
+    });
+    res.json({ count: count, date: date });
   });
-})
+});
 
 const adminName = "admin";
 const adminPassword = "admin";
@@ -231,12 +231,12 @@ router.get("/deleteUser/:id", verifyAdmin, function (req, res, next) {
 router.get("/reports", async (req, res) => {
   let product_count = await productHelpers.getTotalNumberOfProducts();
   let user_count = await userHelpers.getTotalNoOfUsers();
-  let category_count= await productHelpers.getTotalNoOfCategory();
+  let category_count = await productHelpers.getTotalNoOfCategory();
   let userInWords = numWords(user_count);
   let productInWords = numWords(product_count);
   let categoryInWords = numWords(category_count);
-  let cancel_orders=await adminHelpers.getCancelOrders();
-  
+  let cancel_orders = await adminHelpers.getCancelOrders();
+
   res.render("admin/reports", {
     admin: true,
     product_count,
@@ -249,25 +249,34 @@ router.get("/reports", async (req, res) => {
   });
 });
 
-router.post('/ordersByPeriod',(req,res)=>{
-  let key=req.body;
-  adminHelpers.getLastWeek(key).then((response)=>{
-    res.json({"orders":response});
-  })
-})
-
-router.post("/ajax/reports", async (req, res) => {
-  adminHelpers.getOrderReport(req.body).then((reports) => {
-    console.log(reports);
-    res.json({ "reports":reports});
+router.post("/ordersByPeriod", (req, res) => {
+  let key = req.body;
+  adminHelpers.getLastWeek(key).then((response) => {
+    res.json({ orders: response });
   });
 });
 
-router.post('/blockUser',(req,res)=>{
-  console.log(req.body.id);
-  adminHelpers.blockUser(req.body.id).then(()=>{
-    res.json({});
-  })
+router.post("/ajax/reports", async (req, res) => {
+  adminHelpers.getOrderReport(req.body).then((reports) => {
+    res.json({ reports: reports });
+  });
+});
+
+router.post("/blockUser", (req, res) => {
+  adminHelpers
+    .blockUser(req.body.id, req.body.key)
+    .then((response) => {
+      res.json({ blocked: response.blocked  });
+    })
+    .catch((err) => {
+      // res.json({blocked:false});
+      console.log(err);
+    });
+});
+
+router.get('/ajax/blockUser', async(req,res)=>{
+  let all_users = await userHelpers.getUsers();
+  res.json({ "users": all_users})
 })
 
 router.get("/signout", (req, res) => {

@@ -7,15 +7,26 @@ const nocache = require("node-nocache/nocache");
 const date = require("date-and-time");
 const { route } = require("../app");
 const pattern = date.compile("ddd, MMM DD YYYY");
+var request = require("request");
 // const orderid = require('order-id')('mysecret');
 /* GET home page. */
 const verifyUser = (req, res, next) => {
   if (req.session.loggedIn) {
-    next();
+    userHelpers.getOneUser(req.session.userId).then((user) => {
+      if (user.blocked == false) {
+        next();
+      } else if (user.blocked == true) {
+        req.session.loggedIn = null;
+        req.session.user = null;
+        req.session.userId = null;
+        res.redirect("/login");
+      }
+    });
   } else {
     res.redirect("/login");
   }
 };
+
 
 router.get("/", nocache, async function (req, res, next) {
   let cartCount = null;
@@ -46,10 +57,16 @@ router.get("/login", nocache, function (req, res, next) {
 router.post("/login", (req, res) => {
   userHelpers.doLogin(req.body).then((response) => {
     if (response.status === "match") {
-      req.session.loggedIn = true;
-      req.session.user = response.user;
-      req.session.userId = response.user._id;
-      res.send("success");
+      if (response.user.blocked == true) {
+        req.session.blocked = true;
+        res.send("blocked");
+      } else {
+        req.session.loggedIn = true;
+        // req.session.blocked=false;
+        req.session.user = response.user;
+        req.session.userId = response.user._id;
+        res.send("success");
+      }
     } else if (response.status === "missmatch") {
       res.send("missMatch");
     } else if (response.status === "invalid") {
@@ -154,7 +171,6 @@ router.get("/checkout", verifyUser, async (req, res) => {
 });
 
 router.post("/placeOrder", async (req, res) => {
-  
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
 
@@ -218,7 +234,7 @@ router.post("/verifyPaypal/", verifyUser, async (req, res) => {
   });
 });
 
-router.get("/orderSummary/:id",nocache, verifyUser, async (req, res) => {
+router.get("/orderSummary/:id", nocache, verifyUser, async (req, res) => {
   let id = req.params.id;
   let products = await userHelpers.getOrderProducts(id);
   let total = await userHelpers.getOrderTotal(id);
@@ -278,11 +294,11 @@ router.post("/addProfilePic", (req, res) => {
   res.json("response");
 });
 
-router.post('/editProfile',(req,res)=>{
-  userHelpers.editUser(req.session.userId,req.body).then(()=>{
-    res.redirect('/profile');
-  })
-})
+router.post("/editProfile", (req, res) => {
+  userHelpers.editUser(req.session.userId, req.body).then(() => {
+    res.redirect("/profile");
+  });
+});
 
 router.post("/useAddress", async (req, res) => {
   let addressId = req.body.id;
@@ -290,31 +306,31 @@ router.post("/useAddress", async (req, res) => {
   res.json({ address: address });
 });
 
-router.get('/removeAddress/:id',(req,res)=>{
-  let address_id= req.params.id;
-  userHelpers.removeOneAddress(address_id).then(()=>{
-    res.redirect('/profile');
-  })
-});
-
-router.post('/addNewAddress',(req,res)=>{
-  userHelpers.saveAdress(req.body).then(() => {
-    console.log("address saved");
-    res.redirect('/profile');
+router.get("/removeAddress/:id", (req, res) => {
+  let address_id = req.params.id;
+  userHelpers.removeOneAddress(address_id).then(() => {
+    res.redirect("/profile");
   });
 });
 
-router.post('/editAddress', (req,res)=>{
-  userHelpers.getOneAddress(req.body.id).then((address)=>{
-    res.json({"address":address});
-  })
-})
+router.post("/addNewAddress", (req, res) => {
+  userHelpers.saveAdress(req.body).then(() => {
+    console.log("address saved");
+    res.redirect("/profile");
+  });
+});
 
-router.post('/updateAddress', (req,res)=>{
-  userHelpers.editAddress(req.body).then(()=>{
-    res.redirect('/profile');
-  })
-})
+router.post("/editAddress", (req, res) => {
+  userHelpers.getOneAddress(req.body.id).then((address) => {
+    res.json({ address: address });
+  });
+});
+
+router.post("/updateAddress", (req, res) => {
+  userHelpers.editAddress(req.body).then(() => {
+    res.redirect("/profile");
+  });
+});
 
 router.get("/getCategory/:category", async (req, res) => {
   let category = req.params.category;
@@ -328,6 +344,64 @@ router.get("/getCategory/:category", async (req, res) => {
     res.render("user/category", { user, products, categories, cartCount });
   });
 });
+
+router.post('/ajax/isMobile',(req,res)=>{
+  userHelpers.checkMobile(req.body.mobile).then((response)=>{
+    res.json(response);
+  })
+})
+
+router.post("/callOtp", (req, res) => {
+  console.log(req.body.mobile);
+  var options = {
+    method: "POST",
+    url: "https://d7networks.com/api/verifier/send",
+    headers: {
+      Authorization: "Token 1eb6c6a9838dd3131947522bd7a12d10715af67f",
+    },
+    formData: {
+      mobile: "91"+req.body.mobile,
+      sender_id: "SMSINFO",
+      message: "Your otp code is {code}",
+      expiry: "900",
+    },
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body); 
+    // if(response.body.status==='open'){
+      let body=JSON.parse(response.body);
+      console.log('before'+ body.otp_id);
+      req.session.otp_id=body.otp_id;
+      console.log('after' + req.session.otp_id);
+      res.json({response:true});
+    // }
+  });
+});
+
+router.post('/verifyOtp',(req,res)=>{
+  console.log("otp code"+req.body);
+  var options = {
+    'method': 'POST',
+    'url': 'https://d7networks.com/api/verifier/verify',
+    'headers': {
+      'Authorization': 'Token 1eb6c6a9838dd3131947522bd7a12d10715af67f'
+    },
+    formData: {
+      'otp_id': toString(req.session.otp_id),
+      'otp_code': req.body.otpDigit
+    }
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+  });
+});
+
+router.get('/otpVerification',(req,res)=>{
+  console.log(req.session.otp_id);
+  res.render('user/otp-login');
+})
 
 router.get("/logout", (req, res) => {
   req.session.loggedIn = null;
