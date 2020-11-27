@@ -735,4 +735,15 @@ module.exports = {
       }
     });
   },
+  getOneUserWithNumber:(number)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.USER_COLLECTION).findOne({phone:number}).then((user)=>{
+        if(user){
+          resolve(user)
+        }else{
+          reject();
+        }
+      })
+    })
+  }
 };

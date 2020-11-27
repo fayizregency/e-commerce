@@ -11,22 +11,48 @@
             <div class="signin-image">
                 <figure><img src="https://r1.ilikewallpaper.net/pic/201405/Watches_Machinery_Gear_Gold_1_640.jpg"
                         alt="sing up image"></figure>
-                <a href="/signup" class="signup-image-link">Create an account</a>
+                <a href="#" class="signup-image-link">Create an account</a>
             </div>
 
             <div class="signin-form">
-                <h2 class="form-title">Login with OTP</h2>
+                <h3 class="form-title">Login with OTP</h3>
                 
                 <form id="otp-submit" action="/verifyOtp" method="POST" class="register-form" style="display: block;">
                     <div class="form-group">
                         <label for="your_mobile"><i class="zmdi zmdi-smartphone-iphone"></i></label>
-                        <input type="text" placeholder="Enter the 6 digit OTP" name="otpDigit" required />
+                        <input type="text" id="user-enter-otp" placeholder="Enter the 6 digit OTP" name="otpDigit" required />
                     </div>
+                    <p id="err_msg" style="color: rgb(145, 19, 19);"></p>
                     <div class="form-group form-button">
-                        <input type="submit" id="otp-submit" class="form-submit" value="Submit" />
+                        <input type="submit" class="form-submit" value="Submit" />
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    $('#otp-submit').submit((e)=>{
+        e.preventDefault();
+        let otp_id=localStorage.getItem('otp_id');
+        let otp_code= $('#user-enter-otp').val();
+        let user_phone=localStorage.getItem('mobile');
+        $.ajax({
+            url:'/verifyOtp',
+            method:'post',
+            data:{
+                "otp_id":otp_id,
+                "otp_code":otp_code,
+                'user_phone':user_phone
+            },
+            success:(response)=>{
+                if(response.status=='success'){
+                    location.href='/'
+                }else if(response.status=='failed'){
+                    document.getElementById('err_msg').innerHTML=response.err;
+                }
+            }
+        })
+    });
+</script>

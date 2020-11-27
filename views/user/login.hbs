@@ -115,6 +115,8 @@
             data: { "mobile": mobile },
             success: (response) => {
                 console.log(response)
+                localStorage.setItem('otp_id', response.otp_id);
+                localStorage.setItem('mobile',response.user_phone)
                 location.href='/otpVerification'
             }
         })

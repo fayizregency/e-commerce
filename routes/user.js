@@ -8,6 +8,7 @@ const date = require("date-and-time");
 const { route } = require("../app");
 const pattern = date.compile("ddd, MMM DD YYYY");
 var request = require("request");
+const { lchown } = require("fs");
 // const orderid = require('order-id')('mysecret');
 /* GET home page. */
 const verifyUser = (req, res, next) => {
@@ -26,7 +27,6 @@ const verifyUser = (req, res, next) => {
     res.redirect("/login");
   }
 };
-
 
 router.get("/", nocache, async function (req, res, next) {
   let cartCount = null;
@@ -62,7 +62,6 @@ router.post("/login", (req, res) => {
         res.send("blocked");
       } else {
         req.session.loggedIn = true;
-        // req.session.blocked=false;
         req.session.user = response.user;
         req.session.userId = response.user._id;
         res.send("success");
@@ -345,68 +344,80 @@ router.get("/getCategory/:category", async (req, res) => {
   });
 });
 
-router.post('/ajax/isMobile',(req,res)=>{
-  userHelpers.checkMobile(req.body.mobile).then((response)=>{
+router.post("/ajax/isMobile", (req, res) => {
+  userHelpers.checkMobile(req.body.mobile).then((response) => {
     res.json(response);
-  })
-})
+  });
+});
 
 router.post("/callOtp", (req, res) => {
   console.log(req.body.mobile);
+  let user_phone = req.body.mobile;
   var options = {
     method: "POST",
-    url: "https://d7networks.com/api/verifier/send",
+    // url: "https://d7networks.com/api/verifier/send",
     headers: {
       Authorization: "Token 1eb6c6a9838dd3131947522bd7a12d10715af67f",
     },
     formData: {
-      mobile: "91"+req.body.mobile,
+      mobile: "91" + req.body.mobile,
       sender_id: "SMSINFO",
       message: "Your otp code is {code}",
-      expiry: "900",
+      expiry: "9000",
     },
-  };
-  request(options, function (error, response) {
-    if (error) throw new Error(error);
-    console.log(response.body); 
-    // if(response.body.status==='open'){
-      let body=JSON.parse(response.body);
-      console.log('before'+ body.otp_id);
-      req.session.otp_id=body.otp_id;
-      console.log('after' + req.session.otp_id);
-      res.json({response:true});
-    // }
-  });
-});
-
-router.post('/verifyOtp',(req,res)=>{
-  console.log("otp code"+req.body);
-  var options = {
-    'method': 'POST',
-    'url': 'https://d7networks.com/api/verifier/verify',
-    'headers': {
-      'Authorization': 'Token 1eb6c6a9838dd3131947522bd7a12d10715af67f'
-    },
-    formData: {
-      'otp_id': toString(req.session.otp_id),
-      'otp_code': req.body.otpDigit
-    }
   };
   request(options, function (error, response) {
     if (error) throw new Error(error);
     console.log(response.body);
+    let body = JSON.parse(response.body);
+    let otp_id = body.otp_id;
+    res.json({ "otp_id": otp_id, "user_phone":user_phone });
+    // }
   });
 });
 
-router.get('/otpVerification',(req,res)=>{
-  console.log(req.session.otp_id);
-  res.render('user/otp-login');
-})
+router.get("/otpVerification", (req, res) => {
+  res.render("user/otp-login");
+});
+
+
+router.post("/verifyOtp", (req, res) => {
+  console.log(req.body);
+  var options = {
+    method: "POST",
+    url: "https://d7networks.com/api/verifier/verify",
+    headers: {
+      Authorization: "Token 1eb6c6a9838dd3131947522bd7a12d10715af67f",
+    },
+    formData: {
+      otp_id: req.body.otp_id,
+      otp_code: req.body.otp_code,
+    },
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+    let body = JSON.parse(response.body);
+    if (body.status === "success") {
+      userHelpers.getOneUserWithNumber(req.body.user_phone).then((user) => {
+        req.session.loggedIn = true;
+        req.session.user = user;
+        req.session.userId = user._id;
+        res.json({"status":"success"})
+      }).catch((err)=>{
+        console.log(err);
+      })
+    }else{
+      res.json({"status":"failed", "err":body.error})
+    }
+  });
+});
 
 router.get("/logout", (req, res) => {
   req.session.loggedIn = null;
   req.session.user = null;
   req.session.userId = null;
+ 
   res.redirect("/");
 });
 
