@@ -1,0 +1,170 @@
+<style>
+    .container {
+        width: 900px;
+        background: #fff;
+        margin: 0 auto;
+        box-shadow: 0px 15px 16.83px 0.17px rgba(0, 0, 0, 0.05);
+        -moz-box-shadow: 0px 15px 16.83px 0.17px rgba(0, 0, 0, 0.05);
+        -webkit-box-shadow: 0px 15px 16.83px 0.17px rgba(0, 0, 0, 0.05);
+        -o-box-shadow: 0px 15px 16.83px 0.17px rgba(0, 0, 0, 0.05);
+        -ms-box-shadow: 0px 15px 16.83px 0.17px rgba(0, 0, 0, 0.05);
+        border-radius: 20px;
+        -moz-border-radius: 20px;
+        -webkit-border-radius: 20px;
+        -o-border-radius: 20px;
+        -ms-border-radius: 20px;
+        padding-bottom: 1rem;
+        padding-top: 2rem;
+    }
+
+    tr td:first-child:before {
+        counter-increment: Serial;
+        /* Increment the Serial counter */
+        content: "Serial is: "counter(Serial);
+        /* Display the counter */
+    }
+</style>
+
+<div class="container-fluid">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        <div>
+            <h3>Coupon code management</h3>
+            <div class="container">
+                <form class="form-horizontal" action="/admin/addCoupen" method="POST">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="email">coupen code:</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="coupen_code" class="form-control"  placeholder="" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="email">Offer (%)</label>
+                        <div class="col-sm-10">
+                            <input type="number" min="0" name="offer" class="form-control"  placeholder="" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="email">Exp time:</label>
+                        <div class="col-sm-10">
+                            <input type="date" name="exp_time" class="form-control"  placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-dark">Add</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="pt-5 mt-2">
+                <h4>Active Coupon codes</h4>
+                <table class="table table-dark table-md mt-5">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Code</th>
+                            <th scope="col">OFFER (%)</th>
+                            <th scope="col">Exp time</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each coupens}}
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>{{this.coupenCode}} </td>
+                            <td>{{this.offer}} %</td>
+                            <td>{{this.expDate}}</td>
+                            <td><button class="btn btn-dark" data-toggle="modal" data-target="#exampleModalCenter"
+                                    onclick="editCoupen('{{this._id}}')"><i class="far fa-edit"></i></button></td>
+                            <td><button class="btn btn-dark"><i class="far fa-trash-alt"></i></button></td>
+                        </tr>
+                        {{/each}}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Coupon code</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" id="edit-coupen-form" action="/admin/editCoupen" method="POST">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">coupon code:</label>
+                                <div class="col-sm-10">
+                                    <input type="text" id="edit-coupen" name="coupen_code" class="form-control"  placeholder=""
+                                        required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">Offer (%)</label>
+                                <div class="col-sm-10">
+                                    <input type="number" id="edit-offer" name="offer" class="form-control"  placeholder=""
+                                        required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="email">Exp time:</label>
+                                <div class="col-sm-10">
+                                    <input type="date" id="edit-time" name="exp_time" class="form-control"  placeholder="">
+                                </div>
+                            </div>
+                            <input type="text" name="coupen_id" id="hidden-id" hidden>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-dark">submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {{!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div> --}}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function editCoupen(id){
+        $.ajax({
+            url:'/admin/editCoupen/'+id,
+            method:'get',
+            
+            success:(response)=>{
+                $('#edit-coupen').val(response.coupenCode)
+                $('#edit-offer').val(response.offer)
+                $('#edit-time').val(response.expDate)
+                $('#hidden-id').val(response._id)
+            }
+        })
+    }
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+{{!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script> --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>

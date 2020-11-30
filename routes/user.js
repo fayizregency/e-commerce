@@ -15,7 +15,7 @@ const verifyUser = (req, res, next) => {
   if (req.session.loggedIn) {
     userHelpers.getOneUser(req.session.userId).then((user) => {
       if (user.blocked == false) {
-        next();
+        next(); 
       } else if (user.blocked == true) {
         req.session.loggedIn = null;
         req.session.user = null;
@@ -265,7 +265,6 @@ router.get("/myOrders", verifyUser, async (req, res) => {
     orders.forEach((element) => {
       element.date = date.format(element.date, pattern);
     });
-    console.log(orders);
     res.render("user/my-orders", { user: req.session.user, orders });
   });
 });
@@ -280,7 +279,6 @@ router.get("/profile", verifyUser, async (req, res) => {
   let address = await userHelpers.getUserAddress(req.session.userId);
   userHelpers.getOneUser(req.session.userId).then((profile) => {
     profile.firstName = profile.firstName.toUpperCase();
-    profile.lastName = profile.lastName.toUpperCase();
     res.render("user/profile", { user: req.session.user, profile, address });
   });
 });
@@ -398,6 +396,7 @@ router.post("/verifyOtp", (req, res) => {
     if (error) throw new Error(error);
     console.log(response.body);
     let body = JSON.parse(response.body);
+    
     if (body.status === "success") {
       userHelpers.getOneUserWithNumber(req.body.user_phone).then((user) => {
         req.session.loggedIn = true;
@@ -418,7 +417,7 @@ router.get("/logout", (req, res) => {
   req.session.user = null;
   req.session.userId = null;
  
-  res.redirect("/");
+  res.json({response:true});
 });
 
 router.get("/sample", (req, res) => {

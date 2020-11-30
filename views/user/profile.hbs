@@ -86,7 +86,8 @@
                                     <input id="fileInput" type="file" name="file" placeholder="Photo" required=""
                                         capture>
                                     <button class="btn btn-outline-primary" id="profileImage">Add profile pic</button>
-                                    <button onclick="editProfile()" class="btn btn-outline-primary">Edit profile</button>
+                                    <button onclick="editProfile()" class="btn btn-outline-primary">Edit
+                                        profile</button>
                                 </form>
                             </div>
                         </div>
@@ -123,6 +124,20 @@
                             </div>
                         </div>
                         <hr>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">Refferel code</div>
+                                    </div>&nbsp;
+                                    <input type="text" class="form-control" id="inlineFormInputGroup"
+                                        value="{{profile.refferelCode}}" readonly>&nbsp;
+                                    <button class="btn" onclick="myFunction()"><i class="fas fa-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
 
@@ -285,11 +300,11 @@
                     <div class="form-group">
                         <label for="recipient-name" class="col-form-label">Phone</label>
                         <input type="tel" name="phone" class="form-control" id="profile-lname" required>
-                    </div> 
+                    </div>
                     <div class="form-group">
                         <label for="recipient-name" class="col-form-label">Email</label>
                         <input type="email" name="email" class="form-control" id="profile-email" readonly>
-                    </div> 
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -324,16 +339,31 @@
             }
         })
     }
-function editProfile(){
-    $("#editProfile").modal('show');
-    let fname=document.getElementById('profile-firstName').innerHTML;
-    let phone=document.getElementById('profile-phone').innerHTML;
-    let email=document.getElementById('email-div').innerHTML;
-    $('#profile-fname').val(fname);
-    $('#profile-lname').val(phone);
-    $('#profile-email').val(email);
+    function editProfile() {
+        $("#editProfile").modal('show');
+        let fname = document.getElementById('profile-firstName').innerHTML;
+        let phone = document.getElementById('profile-phone').innerHTML;
+        let email = document.getElementById('email-div').innerHTML;
+        $('#profile-fname').val(fname);
+        $('#profile-lname').val(phone);
+        $('#profile-email').val(email);
+    }
 
-}
+    function myFunction() {
+            /* Get the text field */
+            var copyText = document.getElementById("inlineFormInputGroup");
+
+            /* Select the text field */
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+            /* Copy the text inside the text field */
+            document.execCommand("copy");
+
+            /* Alert the copied text */
+            /*alert("Copied the link");*/
+        }
+    
 </script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 

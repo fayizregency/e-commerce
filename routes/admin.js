@@ -277,6 +277,30 @@ router.post("/blockUser", (req, res) => {
 router.get('/ajax/blockUser', async(req,res)=>{
   let all_users = await userHelpers.getUsers();
   res.json({ "users": all_users})
+});
+
+router.get('/coupenCodes', async(req,res)=>{
+  let coupens=await adminHelpers.getAllCoupens();
+  res.render('admin/coupen-code', {admin:true, coupens});
+});
+
+router.post('/addCoupen',(req,res)=>{
+  adminHelpers.addCoupens(req.body).then(()=>{
+    res.redirect('/admin/coupenCodes');
+  })
+});
+
+router.get('/editCoupen/:id',(req,res)=>{
+  let id=req.params.id;
+  adminHelpers.getOneCoupen(id).then((coupen)=>{
+    res.json(coupen);
+  })
+});
+
+router.post('/editCoupen',(req,res)=>{
+  adminHelpers.editCoupen(req.body).then(()=>{
+    res.redirect('/admin/coupenCodes');
+  })
 })
 
 router.get("/signout", (req, res) => {

@@ -1,6 +1,7 @@
 var db = require("../config/connection");
 var collection = require("../config/collections");
 const { response } = require("express");
+const { Code } = require("mongodb");
 var objId = require("mongodb").ObjectID;
 // const pattern = date.compile("YYYY-MM-DD");
 
@@ -160,4 +161,51 @@ module.exports = {
       }
     });
   },
+  addCoupens:(data)=>{
+    console.log(data);
+    return new Promise((resolve, reject)=>{
+      db.get().collection(collection.COUPEN_COLLECTION).insertOne(
+        {
+          coupenCode:data.coupen_code,
+          offer:data.offer,
+          expDate:data.exp_time
+        }
+      ).then(()=>{
+        resolve();
+      }).catch((err)=>{
+        console.log(err);
+      })
+    })
+  },
+  getAllCoupens:()=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.COUPEN_COLLECTION).find().toArray().then((coupens)=>{
+        resolve(coupens);
+      }).catch((err)=>{
+        console.log(err);
+        reject();
+      })
+    })
+  },
+  getOneCoupen:(id)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.COUPEN_COLLECTION).findOne({_id:objId(id)}).then((coupen)=>{
+        resolve(coupen);
+      })
+    })
+  },
+  editCoupen:(data)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.COUPEN_COLLECTION).updateOne({_id:objId(data.coupen_id)},
+      {
+        $set:{
+          coupenCode:data.coupen_code,
+          offer:data.offer,
+          expDate:data.exp_time
+        }
+      }).then(()=>{
+        resolve();
+      })
+    })
+  }
 };

@@ -24,7 +24,8 @@
                     </div>
                     <p id="err_msg" style="color: rgb(145, 19, 19);"></p>
                     <div class="form-group form-button">
-                        <input type="submit" class="form-submit" value="Submit" />
+                        <input type="submit" class="form-submit" id="regency" value="Submit" />
+                        <button class="form-submit" id="loading-btn" style="display: none;"><i class="fa fa-spinner fa-spin"></i></button>
                     </div>
                 </form>
             </div>
@@ -48,6 +49,8 @@
             },
             success:(response)=>{
                 if(response.status=='success'){
+                    $('#regency').hide();
+                    $('#loading-btn').show()
                     location.href='/'
                 }else if(response.status=='failed'){
                     document.getElementById('err_msg').innerHTML=response.err;

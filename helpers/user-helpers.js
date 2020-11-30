@@ -5,7 +5,8 @@ const bcrypt = require("bcrypt");
 const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
-const { default: orderId } = require("order-id");
+// const { default: orderId } = require("order-id");
+let referralCodeGenerator = require('referral-code-generator')
 
 var instance = new Razorpay({
   key_id: "rzp_test_6jhrsB3r51nyzO",
@@ -14,6 +15,8 @@ var instance = new Razorpay({
 
 module.exports = {
   doSignup: (userData) => {
+    let refferel_code=referralCodeGenerator.custom('lowercase', 6, 6, userData.email)
+    console.log(refferel_code);
     return new Promise(async (resolve, reject) => {
       await db
         .get()
@@ -33,6 +36,7 @@ module.exports = {
                 email: userData.email,
                 password: userData.pass1,
                 blocked: false,
+                refferelCode:refferel_code
               })
               .then(() => {
                 resolve({ status: true });
@@ -454,7 +458,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       db.get()
         .collection(collection.ORDER_COLLECTION)
-        .find({ userId: objId(userId) })
+        .find({ userId: objId(userId) }).sort({date:-1})
         .toArray()
         .then((response) => {
           resolve(response);
