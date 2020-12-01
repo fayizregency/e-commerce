@@ -9,13 +9,14 @@ const { route } = require("../app");
 const pattern = date.compile("ddd, MMM DD YYYY");
 var request = require("request");
 const { lchown } = require("fs");
+const adminHelpers = require("../helpers/admin-helpers");
 // const orderid = require('order-id')('mysecret');
 /* GET home page. */
 const verifyUser = (req, res, next) => {
   if (req.session.loggedIn) {
     userHelpers.getOneUser(req.session.userId).then((user) => {
       if (user.blocked == false) {
-        next(); 
+        next();
       } else if (user.blocked == true) {
         req.session.loggedIn = null;
         req.session.user = null;
@@ -170,8 +171,10 @@ router.get("/checkout", verifyUser, async (req, res) => {
 });
 
 router.post("/placeOrder", async (req, res) => {
+  let discount=parseInt(req.body.coupon_off)
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
+  totalPrice=totalPrice-discount;
 
   if (req.body.paymentMethod === "COD") {
     userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
@@ -237,7 +240,9 @@ router.get("/orderSummary/:id", nocache, verifyUser, async (req, res) => {
   let id = req.params.id;
   let products = await userHelpers.getOrderProducts(id);
   let total = await userHelpers.getOrderTotal(id);
+  let amount= await userHelpers.getOrderAmount(id);
   let productTotal = await userHelpers.getProductTotal(id);
+  let offer=total-amount;
 
   products.forEach((element, index) => {
     element.product.price = productTotal[index].total;
@@ -250,6 +255,8 @@ router.get("/orderSummary/:id", nocache, verifyUser, async (req, res) => {
       order,
       products,
       total,
+      amount,
+      offer
     });
   });
 });
@@ -369,7 +376,7 @@ router.post("/callOtp", (req, res) => {
     console.log(response.body);
     let body = JSON.parse(response.body);
     let otp_id = body.otp_id;
-    res.json({ "otp_id": otp_id, "user_phone":user_phone });
+    res.json({ otp_id: otp_id, user_phone: user_phone });
     // }
   });
 });
@@ -377,7 +384,6 @@ router.post("/callOtp", (req, res) => {
 router.get("/otpVerification", (req, res) => {
   res.render("user/otp-login");
 });
-
 
 router.post("/verifyOtp", (req, res) => {
   console.log(req.body);
@@ -396,19 +402,34 @@ router.post("/verifyOtp", (req, res) => {
     if (error) throw new Error(error);
     console.log(response.body);
     let body = JSON.parse(response.body);
-    
+
     if (body.status === "success") {
-      userHelpers.getOneUserWithNumber(req.body.user_phone).then((user) => {
-        req.session.loggedIn = true;
-        req.session.user = user;
-        req.session.userId = user._id;
-        res.json({"status":"success"})
-      }).catch((err)=>{
-        console.log(err);
-      })
-    }else{
-      res.json({"status":"failed", "err":body.error})
+      userHelpers
+        .getOneUserWithNumber(req.body.user_phone)
+        .then((user) => {
+          req.session.loggedIn = true;
+          req.session.user = user;
+          req.session.userId = user._id;
+          res.json({ status: "success" });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      res.json({ status: "failed", err: body.error });
     }
+  });
+});
+
+router.post("/applyCoupon", (req, res) => {
+  userHelpers.applyCoupen(req.body, req.session.userId).then(async(response) => {
+    if (response){
+      let total=await userHelpers.getTotalPrice(req.session.userId);
+      discount=total-response.result;
+      response.total=total;
+      response.discount=discount;
+      res.json(response);
+    } 
   });
 });
 
@@ -416,8 +437,8 @@ router.get("/logout", (req, res) => {
   req.session.loggedIn = null;
   req.session.user = null;
   req.session.userId = null;
- 
-  res.json({response:true});
+
+  res.json({ response: true });
 });
 
 router.get("/sample", (req, res) => {

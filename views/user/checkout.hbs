@@ -22,7 +22,8 @@
   .lh-condensed {
     line-height: 1.25;
   }
-  #paymentMethod-error{
+
+  #paymentMethod-error {
     display: none !important;
   }
 </style>
@@ -39,7 +40,22 @@
 
 
     <div class="row">
+
       <div class="col-md-5 order-md-2 mb-4">
+        <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Coupon code</div>
+        <div class="p-4">
+          <p class="font-italic mb-4">If you have a coupon code, please enter it in the box below</p>
+          <div class="input-group mb-4 border rounded-pill p-2">
+            <input type="text" placeholder="Apply coupon" id="coupon-input" aria-describedby="button-addon3"
+              class="form-control border-0">
+            <div class="input-group-append border-0">
+              <button id="button-addon3" type="button" class="btn btn-dark btn-sm rounded-pill"><i
+                  class="fa fa-gift mr-2"></i>Apply coupon</button>
+            </div>
+          </div>
+          <p id="invalid-coupon" style="display: none; color:crimson; margin-left:1rem;">Invalid coupon</p>
+
+        </div>
         <h4 class="d-flex justify-content-between align-items-center mb-3">
           <span class="text-muted">Your cart</span>
           <span class="badge badge-secondary badge-pill">{{cartCount}}</span>
@@ -54,10 +70,16 @@
             <span class="text-muted">₹. {{this.product.price}}</span>
           </li>
           {{/each}}
-
+          <li id="coupon-li" class="list-group-item d-flex justify-content-between lh-condensed">
+            <div>
+              <h6 class="my-0">coupen off</h6>
+              <small class="text-muted"></small>
+            </div>
+            <span>-₹.<span id="coupen-span" class="text-muted"></span></span>
+          </li>
           <li class="list-group-item d-flex justify-content-between">
-            <span>Total </span>
-            <strong>₹. {{totalPrice}}</strong>
+            <strong>Total </strong>
+            <strong id="after-total">₹. {{totalPrice}}</strong>
           </li>
         </ul>
 
@@ -79,67 +101,68 @@
               </div>
             </div>
           </div>
-          </div>
-          {{/each}}
+        </div>
+        {{/each}}
         <hr>
-          <button class="btn btn-sm" style="background-color: #abb;display: none;" id="form-hide-btn" onclick="showForm()">Deliver To Another address</button>
-        <hr>
+        <button class="btn btn-sm" style="background-color: #abb;display: none;" id="form-hide-btn"
+          onclick="showForm()">Deliver To Another address</button>
+        {{!-- <hr> --}}
         <form class="needs-validation" id="checkout-form" novalidate>
           <div id="form-hide-div">
-          <div class="row">
-            <div class="col-md-12 mb-3">
-              <label for="firstName">Full Name</label>
-              <input type="text" class="form-control" name="name" id="firstName" placeholder="" value="" required>
-              <div class="invalid-feedback">
-                Valid first name is required.
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label for="firstName">Full Name</label>
+                <input type="text" class="form-control" name="name" id="firstName" placeholder="" value="" required>
+                <div class="invalid-feedback">
+                  Valid first name is required.
+                </div>
               </div>
             </div>
-          </div>
 
 
-          <div class="mb-3">
-            <label for="email">Email <span class="text-muted"></span></label>
-            <input type="email" class="form-control" name="email" id="email" placeholder="you@example.com" required>
-            <div class="invalid-feedback">
-              Please enter a valid email address for shipping updates.
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="address">Address</label>
-            <textarea type="textarea" class="form-control" name="address" id="address" placeholder="1234 Main St"
-              required></textarea>
-            <div class="invalid-feedback">
-              Please enter your shipping address.
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="mobile">Mobile</label>
-              <input type="text" class="form-control" name="mobile" id="mobile" required>
+            <div class="mb-3">
+              <label for="email">Email <span class="text-muted"></span></label>
+              <input type="email" class="form-control" name="email" id="email" placeholder="you@example.com" required>
               <div class="invalid-feedback">
-                Please enter your mobile number.
+                Please enter a valid email address for shipping updates.
               </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-3 mb-3">
-              <label for="zip">Pin code</label>
-              <input type="number" class="form-control" name="pin" id="zip" placeholder="" required>
+
+            <div class="mb-3">
+              <label for="address">Address</label>
+              <textarea type="textarea" class="form-control" name="address" id="address" placeholder="1234 Main St"
+                required></textarea>
               <div class="invalid-feedback">
-                pin code required.
+                Please enter your shipping address.
               </div>
             </div>
-          </div>
-          <div class="">
-            <input class="form-check-input" type="checkbox" name="save-address" value="address" id="defaultCheck1">
-            <label class="form-check-label" for="defaultCheck1">
-              save this address
-            </label>
-          </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="mobile">Mobile</label>
+                <input type="text" class="form-control" name="mobile" id="mobile" required>
+                <div class="invalid-feedback">
+                  Please enter your mobile number.
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label for="zip">Pin code</label>
+                <input type="number" class="form-control" name="pin" id="zip" placeholder="" required>
+                <div class="invalid-feedback">
+                  pin code required.
+                </div>
+              </div>
+            </div>
+            <div class="">
+              <input class="form-check-input" type="checkbox" name="save-address" value="address" id="defaultCheck1">
+              <label class="form-check-label" for="defaultCheck1">
+                save this address
+              </label>
+            </div>
 
-          <hr class="mb-4">
-        </div>
+            <hr class="mb-4">
+          </div>
           <h4 class="mb-3">Payment</h4>
 
           <div class="d-block my-3">
@@ -154,7 +177,7 @@
           <input type="text" name="userId" value="{{user._id}}" hidden>
 
           <hr class="mb-4">
-          <div id="place-order-id"><button class="btn btn-dark btn-md btn-block" id="checkout-form" type="submit"
+          <div id="place-order-id"><button class="btn btn-dark btn-md btn-block" id="checkout-button" type="submit"
               style="border-radius: 2.25rem;height:50px; font-size: 20px;font-weight: 600;">Place Your Order</button>
           </div>
         </form>
@@ -163,3 +186,30 @@
 
   </div>
 
+  <script>
+    $('#button-addon3').click(function () {
+      let coupon_code = $('#coupon-input').val();
+      $.ajax({
+        url: '/applyCoupon',
+        method: 'post',
+        data: {
+          'coupon_code': coupon_code
+        },
+        success: (response) => {
+          
+          if (response.status) {
+            let off = response.result;
+            $('#invalid-coupon').hide();
+            $('#coupon-li').show();
+            $('#coupen-span').html(off);
+            $('#after-total').html("₹." + response.discount)
+          }
+          else {
+            $('#coupen-span').html('');
+            $('#invalid-coupon').show();
+            $('#after-total').html("₹. " + response.total)
+          }
+        }
+      })
+    })
+  </script>

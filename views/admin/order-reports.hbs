@@ -1,0 +1,76 @@
+
+<div class="container-fluid">
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4 row">
+
+    <div class="pt-5" >
+      <h2>Order Reports( By period )</h2>
+      {{!-- <p>The .table-bordered class adds borders to a table:</p> --}}
+      <div class="mb-5 mt-5 d-flex ">
+        <div class="dropdown">
+          <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            select a period
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <button class="dropdown-item" onclick="getOrderByPeriod(7)">Last week</button>
+            <button class="dropdown-item" onclick="getOrderByPeriod(30)">Last month</button>
+            <button class="dropdown-item" onclick="getOrderByPeriod(365)">Last year</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+      <table class="table table-bordered table-sm" id="report-table">
+        <thead>
+          <tr>
+            <th>customer</th>
+            <th>phone</th>
+            <th>Address</th>
+            <th>order id</th>
+            <th>order date</th>
+            <th>payment method</th>
+            <th>payment status</th>
+            <th>shipment status</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    </div>
+  </main>
+</div>
+
+<!-- Icons -->
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>
+
+<script>
+
+
+  function getOrderByPeriod(period) {
+    console.log(period);
+    $.ajax({
+      url: '/admin/ordersByPeriod',
+      data: period,
+      method: "post",
+      success: (response) => {
+        console.log(response.orders)
+        // here we populate data returned by controller
+        // if returned data is a plain array, then parse into javascript obj
+        var d = (response.orders);
+        // d = [{ name : 'john', phone : 123 }]; --> example
+        // this depend on your returned data from controller
+        var output;
+        $.each(d, function (i, e) {
+          // here you structured the code depend on the table of yours
+          output += '<tr><td>' + e.deliveryDetails.name + '</td><td>' + e.deliveryDetails.phone + '</td><td>' + e.deliveryDetails.address + '</td><td>' + e._id + '</td><td>' + e.date + '</td><td>' + e.paymentMethod + '</td><td>' + e.payment_status + '</td><td>' + e.shipment_status + '</td></tr>';
+        });
+
+        // after finish creating html structure, append the output
+        // into the table
+        $('#report-table').append(output);
+
+      }
+    })
+  }
+</script>

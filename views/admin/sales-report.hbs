@@ -1,0 +1,70 @@
+<div class="container-fluid">
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4 row">
+    
+    <div class="pt-5">
+      <h2>Sales Reports( custom date )</h2>
+      {{!-- <p>The .table-bordered class adds borders to a table:</p> --}}
+      <div class="mb-5 mt-5 d-flex justify-content-center">
+        <span class="mr-2">Start date<input class="ml-2" id="start-date" type="date" value=""></span>
+        <span class="ml-2">End date<input class="ml-2" id="end-date" type="date" value=""></span>
+        <button id="getReport" class="ml-2 btn btn-light">submit</button>
+      </div>
+      <table class="table table-bordered" >
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Total Orders</th>
+            <th>Total products sold</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="selected-date"></td>
+            <td id="total-orders"></td>
+            <td id="total-products"></td>
+            <td id="total-amount"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+     
+
+
+     
+  </main>
+</div>
+
+<!-- Icons -->
+<script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>
+
+<script>
+  $('#getReport').click(function () {
+    let startDate = $('#start-date').val();
+    let endDate = $('#end-date').val();
+    console.log(startDate, endDate);
+
+    $.ajax({
+      url: '/admin/ajax/reports',
+      method: 'post',
+      data: {
+        "startDate": startDate,
+        "endDate": endDate
+      },
+      success: (response) => {
+        console.log(response.reports)
+        if (response.reports) {
+          document.getElementById('selected-date').innerHTML = startDate + " to " + endDate;
+          document.getElementById('total-orders').innerHTML = response.reports.total_orders
+          document.getElementById('total-products').innerHTML = response.reports.total_products
+          document.getElementById('total-amount').innerHTML = "₹ " + response.reports.total_amount
+        }
+      }
+    })
+  })
+
+</script>

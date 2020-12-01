@@ -166,7 +166,10 @@ $("#checkout-form").submit((e) => {
     } else {
       checked = false;
     }
+    let coupon_off=$('#coupen-span').html()
+    console.log(coupon_off)
     fd.append("checked", checked);
+    fd.append("coupon_off",coupon_off)
     $.ajax({
       url: "/placeOrder",
       method: "post",

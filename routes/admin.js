@@ -95,7 +95,7 @@ router.get("/shipOrder/:id", (req, res) => {
 router.get("/shipCancelOrder/:id", (req, res) => {
   let order_id = req.params.id;
   userHelpers.shipOrder(order_id).then(() => {
-    res.redirect("/admin/reports");
+    res.redirect("/admin/cancelledOrders");
   });
 });
 
@@ -235,7 +235,6 @@ router.get("/reports", async (req, res) => {
   let userInWords = numWords(user_count);
   let productInWords = numWords(product_count);
   let categoryInWords = numWords(category_count);
-  let cancel_orders = await adminHelpers.getCancelOrders();
 
   res.render("admin/reports", {
     admin: true,
@@ -245,7 +244,7 @@ router.get("/reports", async (req, res) => {
     userInWords,
     productInWords,
     categoryInWords,
-    cancel_orders,
+    
   });
 });
 
@@ -255,6 +254,19 @@ router.post("/ordersByPeriod", (req, res) => {
     res.json({ orders: response });
   });
 });
+
+router.get('/salesReport',(req,res)=>{
+  res.render('admin/sales-report',{admin:true})
+});
+
+router.get('/orderReport',(req,res)=>{
+  res.render('admin/order-reports',{admin:true});
+});
+
+router.get('/cancelledOrders',async(req,res)=>{
+  let cancel_orders = await adminHelpers.getCancelOrders();
+  res.render('admin/cancelled-orders',{admin:true, cancel_orders})
+})
 
 router.post("/ajax/reports", async (req, res) => {
   adminHelpers.getOrderReport(req.body).then((reports) => {
@@ -269,7 +281,6 @@ router.post("/blockUser", (req, res) => {
       res.json({ blocked: response.blocked  });
     })
     .catch((err) => {
-      // res.json({blocked:false});
       console.log(err);
     });
 });
@@ -301,7 +312,13 @@ router.post('/editCoupen',(req,res)=>{
   adminHelpers.editCoupen(req.body).then(()=>{
     res.redirect('/admin/coupenCodes');
   })
-})
+});
+
+router.get('/offers', async(req,res)=>{
+  let products=await productHelpers.getProduct();
+  let category=await productHelpers.getAllCategory();
+  res.render('admin/product-offer',{admin:true, products,category});
+});
 
 router.get("/signout", (req, res) => {
   req.session.admin = null;

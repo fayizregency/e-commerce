@@ -6,7 +6,8 @@ const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
 // const { default: orderId } = require("order-id");
-let referralCodeGenerator = require('referral-code-generator')
+let referralCodeGenerator = require('referral-code-generator');
+const { count } = require("console");
 
 var instance = new Razorpay({
   key_id: "rzp_test_6jhrsB3r51nyzO",
@@ -16,7 +17,6 @@ var instance = new Razorpay({
 module.exports = {
   doSignup: (userData) => {
     let refferel_code=referralCodeGenerator.custom('lowercase', 6, 6, userData.email)
-    console.log(refferel_code);
     return new Promise(async (resolve, reject) => {
       await db
         .get()
@@ -401,6 +401,13 @@ module.exports = {
       resolve(total[0].total);
     });
   },
+  getOrderAmount:(id)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ORDER_COLLECTION).findOne({_id:objId(id)}).then((order)=>{
+        resolve(order.amount)
+      })
+    });
+  },
   getProductTotal: (orderId) => {
     return new Promise(async (resolve, reject) => {
       let productTotal = await db
@@ -748,6 +755,62 @@ module.exports = {
           reject();
         }
       })
+    })
+  },
+  applyCoupen:(code, userId)=>{
+    let response={};
+    return new Promise(async(resolve,reject)=>{
+      let coupon=await db.get().collection(collection.COUPEN_COLLECTION).findOne({coupenCode:code.coupon_code});
+      if(coupon){
+        let discount=parseFloat(coupon.offer)
+        db.get().collection(collection.CART_COLLECTION).aggregate([
+          {
+            $match: { user: objId(userId) },
+          },
+          {
+            $unwind: "$products",
+          },
+          {
+            $project: {
+              item: "$products.item",
+              quantity: "$products.quantity",
+            },
+          },
+          {
+            $lookup: {
+              from: collection.PRODUCT_COLLECTION,
+              localField: "item",
+              foreignField: "_id",
+              as: "product",
+            },
+          },
+          {
+            $project: {
+              item: 1,
+              quantity: 1,
+              product: { $arrayElemAt: ["$product", 0] },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: { $multiply: ["$quantity", "$product.price"] } },
+            },
+          },
+          {
+            $project:{
+              discount:{$divide:[{$multiply:['$total',discount]},100]}
+            }
+          }
+        ]).toArray().then((result)=>{
+          response.status=true;
+          response.result=result[0].discount;
+          resolve(response)
+        })
+      }else{
+        response.status=false;
+        resolve(response);
+      }
     })
   }
 };
