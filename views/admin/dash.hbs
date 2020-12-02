@@ -1,3 +1,9 @@
+<style>
+  .chart-div {
+    height: ;
+    width: ;
+  }
+</style>
 <div class="container-fluid">
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
@@ -14,17 +20,29 @@
         <div class="dropdown">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false"><span data-feather="calendar"></span>
-            This week
+            This Month
           </button>
+          <!--
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="#">This month</a>
             <a class="dropdown-item" href="#">This year</a>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
-
-    <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
+    <div class="chart-div row">
+      <div class="col-sm-12 col-md-6">
+        <canvas class="my-4" id="myChart" width="900z" height="380"></canvas>
+      </div>
+      <div class="col-sm-12 col-md-6">
+        <canvas class="my-4" id="myChart2"></canvas>
+      </div>
+    </div>
+    <div class="chart-div row">
+      <div class="col-sm-12 col-md-6">
+        <canvas id="myChart3"></canvas>
+      </div>
+    </div>
   </main>
 </div>
 </div>
@@ -46,8 +64,8 @@
       success: (response) => {
         let count = response.count;
         let day = response.date;
-        var ctx = document.getElementById("myChart");
-        var myChart = new Chart(ctx, {
+        let ctx = document.getElementById("myChart");
+        let myChart = new Chart(ctx, {
           type: 'bar',
           data: {
             labels: day,
@@ -87,7 +105,7 @@
             title: {
               display: true,
               text: 'Orders',
-              position: "left"
+              position: "left",
             },
           },
 
@@ -95,6 +113,93 @@
       }
     })
 
+    $.ajax({
+      url: '/admin/ajax/pieChart',
+      method: 'get',
+      success: (response) => {
+        let ctx2 = document.getElementById("myChart2");
+        let myChart = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: ['cancelled orders', 'pending orders', 'placed orders'],
+            datasets: [{
+              label: 'Of Orders',
+              data: response,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+              ], borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+              ],
+              borderWidth: .5
+            }]
+          },
+          options: {
+          },
+        });
+      }
+    })
+
+    $.ajax({
+      url: '/admin/ajax/lineChart',
+      method: 'get',
+      success: (response) => {
+        var ctx3 = document.getElementById('myChart3').getContext('2d');
+        var myChart = new Chart(ctx3, {
+          type: 'line',
+          data: {
+            labels: response.date,
+            datasets: [{
+              label: '# of sales',
+              data: response.sales,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+              ],
+              borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
+            },
+            legend: {
+              display: false,
+            },
+            title: {
+              display: true,
+              text: 'Sales',
+              position: "left",
+            },
+          },
+        });
+      }
+    })
 
   })
 

@@ -41,9 +41,44 @@ router.get("/ajax/graph", (req, res) => {
       date.push(element._id.day);
       count.push(element.count);
     });
+    // console.log(count+"\n"+date);
     res.json({ count: count, date: date });
   });
 });
+
+router.get("/ajax/lineChart", (req, res) => {
+  let sales = [];
+  var date = [];
+  adminHelpers.lastWeekOrder().then((weekly_reports) => {
+    weekly_reports.forEach((element) => {
+      date.push(element._id.day);
+      sales.push(element.amount);
+    });
+    // console.log(count+"\n"+date);
+    res.json({ sales: sales, date: date });
+  });
+});
+
+router.get('/ajax/pieChart',async(req,res)=>{
+  let cancel=0;
+  let pending=0;
+  let placed=0;
+  let report=[];
+  let orders=await userHelpers.getAllOrders();
+  orders.forEach((element)=>{
+    if(element.shipment_status==='Not shipped'){
+      pending++
+    }
+    else if(element.shipment_status==='Order cancelled'){
+      cancel++
+    }
+    else if(element.shipment_status==='Order shipped'){
+      placed++
+    }
+  })
+  report.push(cancel,pending,placed)
+  res.json(report)
+})
 
 const adminName = "admin";
 const adminPassword = "admin";

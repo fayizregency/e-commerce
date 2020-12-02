@@ -60,7 +60,7 @@ module.exports = {
         .aggregate([
           {
             $match: {
-              date: { $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000) },
+              date: { $gte: new Date(new Date() - 30 * 60 * 60 * 24 * 1000) },
             },
           },
 
@@ -82,10 +82,15 @@ module.exports = {
               count: { $sum: 1 },
             },
           },
+          {
+            $sort:{_id:1}
+          },
+          
         ])
 
         .toArray()
         .then((response) => {
+          // console.log(response)
           resolve(response);
         });
     });

@@ -437,7 +437,6 @@ router.get("/logout", (req, res) => {
   req.session.loggedIn = null;
   req.session.user = null;
   req.session.userId = null;
-
   res.json({ response: true });
 });
 
