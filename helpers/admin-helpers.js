@@ -212,5 +212,12 @@ module.exports = {
         resolve();
       })
     })
+  },
+  deleteCoupon:(id)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.COUPEN_COLLECTION).removeOne({_id:objId(id)}).then(()=>{
+        resolve();
+      })
+    })
   }
 };

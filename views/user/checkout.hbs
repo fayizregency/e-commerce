@@ -54,6 +54,8 @@
             </div>
           </div>
           <p id="invalid-coupon" style="display: none; color:crimson; margin-left:1rem;">Invalid coupon</p>
+          <p id="used-coupon" style="display: none; color:crimson; margin-left:1rem;">Coupon already used</p>
+
 
         </div>
         <h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -70,12 +72,12 @@
             <span class="text-muted">₹. {{this.product.price}}</span>
           </li>
           {{/each}}
-          <li id="coupon-li" class="list-group-item d-flex justify-content-between lh-condensed">
-            <div>
+          <li id="coupon-li" class="list-group-item" style="display: none;">
+            <div class="d-flex justify-content-between lh-condensed">
               <h6 class="my-0">coupen off</h6>
               <small class="text-muted"></small>
-            </div>
             <span>-₹.<span id="coupen-span" class="text-muted"></span></span>
+            </div>
           </li>
           <li class="list-group-item d-flex justify-content-between">
             <strong>Total </strong>
@@ -197,15 +199,25 @@
         },
         success: (response) => {
           
-          if (response.status) {
+          if (response.status=="available") {
             let off = response.result;
             $('#invalid-coupon').hide();
+            $('#used-coupon').hide();
             $('#coupon-li').show();
             $('#coupen-span').html(off);
             $('#after-total').html("₹." + response.discount)
           }
+          else if(response.status=='used'){
+            $('#coupen-span').html('');
+            $('#coupon-li').hide();
+            $('#invalid-coupon').hide();
+            $('#used-coupon').show();
+            $('#after-total').html("₹. " + response.total)
+          }
           else {
             $('#coupen-span').html('');
+            $('#coupon-li').hide();
+            $('#used-coupon').hide();
             $('#invalid-coupon').show();
             $('#after-total').html("₹. " + response.total)
           }

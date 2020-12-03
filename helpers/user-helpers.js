@@ -6,8 +6,9 @@ const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
 // const { default: orderId } = require("order-id");
-let referralCodeGenerator = require('referral-code-generator');
+let referralCodeGenerator = require("referral-code-generator");
 const { count } = require("console");
+const { use } = require("../routes/user");
 
 var instance = new Razorpay({
   key_id: "rzp_test_6jhrsB3r51nyzO",
@@ -16,7 +17,18 @@ var instance = new Razorpay({
 
 module.exports = {
   doSignup: (userData) => {
-    let refferel_code=referralCodeGenerator.custom('lowercase', 6, 6, userData.email)
+    let refferelCode = referralCodeGenerator.custom(
+      "lowercase",
+      4,
+      6,
+      userData.email
+    );
+    let referrel = {
+      code: refferelCode,
+      referrer: userData.referrer,
+      referredUsers: 0,
+      firstPurchase: false,
+    };
     return new Promise(async (resolve, reject) => {
       await db
         .get()
@@ -36,7 +48,7 @@ module.exports = {
                 email: userData.email,
                 password: userData.pass1,
                 blocked: false,
-                refferelCode:refferel_code
+                referrel: referrel,
               })
               .then(() => {
                 resolve({ status: true });
@@ -401,11 +413,14 @@ module.exports = {
       resolve(total[0].total);
     });
   },
-  getOrderAmount:(id)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.ORDER_COLLECTION).findOne({_id:objId(id)}).then((order)=>{
-        resolve(order.amount)
-      })
+  getOrderAmount: (id) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .findOne({ _id: objId(id) })
+        .then((order) => {
+          resolve(order.amount);
+        });
     });
   },
   getProductTotal: (orderId) => {
@@ -465,7 +480,8 @@ module.exports = {
     return new Promise((resolve, reject) => {
       db.get()
         .collection(collection.ORDER_COLLECTION)
-        .find({ userId: objId(userId) }).sort({date:-1})
+        .find({ userId: objId(userId) })
+        .sort({ date: -1 })
         .toArray()
         .then((response) => {
           resolve(response);
@@ -746,71 +762,119 @@ module.exports = {
       }
     });
   },
-  getOneUserWithNumber:(number)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.USER_COLLECTION).findOne({phone:number}).then((user)=>{
-        if(user){
-          resolve(user)
-        }else{
-          reject();
-        }
-      })
-    })
-  },
-  applyCoupen:(code, userId)=>{
-    let response={};
-    return new Promise(async(resolve,reject)=>{
-      let coupon=await db.get().collection(collection.COUPEN_COLLECTION).findOne({coupenCode:code.coupon_code});
-      if(coupon){
-        let discount=parseFloat(coupon.offer)
-        db.get().collection(collection.CART_COLLECTION).aggregate([
-          {
-            $match: { user: objId(userId) },
-          },
-          {
-            $unwind: "$products",
-          },
-          {
-            $project: {
-              item: "$products.item",
-              quantity: "$products.quantity",
-            },
-          },
-          {
-            $lookup: {
-              from: collection.PRODUCT_COLLECTION,
-              localField: "item",
-              foreignField: "_id",
-              as: "product",
-            },
-          },
-          {
-            $project: {
-              item: 1,
-              quantity: 1,
-              product: { $arrayElemAt: ["$product", 0] },
-            },
-          },
-          {
-            $group: {
-              _id: null,
-              total: { $sum: { $multiply: ["$quantity", "$product.price"] } },
-            },
-          },
-          {
-            $project:{
-              discount:{$divide:[{$multiply:['$total',discount]},100]}
-            }
+  getOneUserWithNumber: (number) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.USER_COLLECTION)
+        .findOne({ phone: number })
+        .then((user) => {
+          if (user) {
+            resolve(user);
+          } else {
+            reject();
           }
-        ]).toArray().then((result)=>{
-          response.status=true;
-          response.result=result[0].discount;
-          resolve(response)
-        })
-      }else{
-        response.status=false;
+        });
+    });
+  },
+  applyCoupon: (code, userId) => {
+    let response = {};
+    return new Promise(async (resolve, reject) => {
+      let coupon = await db
+        .get()
+        .collection(collection.COUPEN_COLLECTION)
+        .findOne({ coupenCode: code.coupon_code });
+      if (coupon) {
+        db.get()
+          .collection(collection.USER_COLLECTION)
+          .aggregate([
+            {
+              $match:{
+                _id:objId(userId),
+                usedCoupons:{$regex:"^"+code.coupon_code, '$options': 'i'}
+              }
+            }
+          ]).toArray()
+          .then((user) => {
+            if (user.length !=0) {
+              response.status='used'
+              resolve(response);
+            } else {
+              let discount = parseFloat(coupon.offer);
+              db.get()
+                .collection(collection.CART_COLLECTION)
+                .aggregate([
+                  {
+                    $match: { user: objId(userId) },
+                  },
+                  {
+                    $unwind: "$products",
+                  },
+                  {
+                    $project: {
+                      item: "$products.item",
+                      quantity: "$products.quantity",
+                    },
+                  },
+                  {
+                    $lookup: {
+                      from: collection.PRODUCT_COLLECTION,
+                      localField: "item",
+                      foreignField: "_id",
+                      as: "product",
+                    },
+                  },
+                  {
+                    $project: {
+                      item: 1,
+                      quantity: 1,
+                      product: { $arrayElemAt: ["$product", 0] },
+                    },
+                  },
+                  {
+                    $group: {
+                      _id: null,
+                      total: {
+                        $sum: { $multiply: ["$quantity", "$product.price"] },
+                      },
+                    },
+                  },
+                  {
+                    $project: {
+                      discount: {
+                        $divide: [{ $multiply: ["$total", discount] }, 100],
+                      },
+                    },
+                  },
+                ])
+                .toArray()
+                .then((result) => {
+                  response.status = 'available';
+                  response.result = result[0].discount;
+                  resolve(response);
+                });
+            }
+          });
+      } else {
+        response.status = false;
         resolve(response);
       }
-    })
-  }
+    });
+  },
+  usedCoupon: (userId, coupon) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.USER_COLLECTION)
+        .updateOne(
+          { _id: objId(userId) },
+          {
+            $push: {
+              usedCoupons: coupon,
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
+    });
+  },
 };

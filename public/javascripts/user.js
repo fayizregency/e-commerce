@@ -19,6 +19,7 @@ $("#signup").click(function () {
         email: $("#email").val(),
         pass1: $("#pass1").val(),
         pass2: $("#pass2").val(),
+        referrer:$('#referrer').val()
       },
 
       function (data, status) {
@@ -161,15 +162,19 @@ $("#checkout-form").submit((e) => {
     var myform = document.getElementById("checkout-form");
     var fd = new FormData(myform);
     let checked = false;
+    let coupon_off=$('#coupen-span').html()
+    let coupon_code=$('#coupon-input').val()
     if ($("#defaultCheck1").is(":checked")) {
       checked = true;
     } else {
       checked = false;
     }
-    let coupon_off=$('#coupen-span').html()
     console.log(coupon_off)
     fd.append("checked", checked);
-    fd.append("coupon_off",coupon_off)
+    fd.append("coupon_off",coupon_off);
+    if(coupon_code){
+      fd.append('coupon',coupon_code)
+    }
     $.ajax({
       url: "/placeOrder",
       method: "post",

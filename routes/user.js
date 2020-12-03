@@ -171,10 +171,11 @@ router.get("/checkout", verifyUser, async (req, res) => {
 });
 
 router.post("/placeOrder", async (req, res) => {
-  let discount=parseInt(req.body.coupon_off)
+  console.log(req.body)
+  let discount = parseInt(req.body.coupon_off);
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
-  totalPrice=totalPrice-discount;
+  totalPrice = totalPrice - discount;
 
   if (req.body.paymentMethod === "COD") {
     userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
@@ -212,6 +213,7 @@ router.post("/placeOrder", async (req, res) => {
       console.log("address saved");
     });
   }
+  userHelpers.usedCoupon(req.session.userId, req.body.coupon);
 });
 
 router.post("/verifyPayment", (req, res) => {
@@ -240,9 +242,9 @@ router.get("/orderSummary/:id", nocache, verifyUser, async (req, res) => {
   let id = req.params.id;
   let products = await userHelpers.getOrderProducts(id);
   let total = await userHelpers.getOrderTotal(id);
-  let amount= await userHelpers.getOrderAmount(id);
+  let amount = await userHelpers.getOrderAmount(id);
   let productTotal = await userHelpers.getProductTotal(id);
-  let offer=total-amount;
+  let offer = total - amount;
 
   products.forEach((element, index) => {
     element.product.price = productTotal[index].total;
@@ -256,7 +258,7 @@ router.get("/orderSummary/:id", nocache, verifyUser, async (req, res) => {
       products,
       total,
       amount,
-      offer
+      offer,
     });
   });
 });
@@ -285,6 +287,7 @@ router.get("/viewOrderProducts/:id", (req, res) => {
 router.get("/profile", verifyUser, async (req, res) => {
   let address = await userHelpers.getUserAddress(req.session.userId);
   userHelpers.getOneUser(req.session.userId).then((profile) => {
+    console.log(profile);
     profile.firstName = profile.firstName.toUpperCase();
     res.render("user/profile", { user: req.session.user, profile, address });
   });
@@ -293,7 +296,6 @@ router.get("/profile", verifyUser, async (req, res) => {
 router.post("/addProfilePic", (req, res) => {
   let id = req.session.userId;
   let image = req.files.file;
-  // console.log(req.files);
   image.mv("./public/user-images/" + id + ".jpg");
   res.json("response");
 });
@@ -377,7 +379,6 @@ router.post("/callOtp", (req, res) => {
     let body = JSON.parse(response.body);
     let otp_id = body.otp_id;
     res.json({ otp_id: otp_id, user_phone: user_phone });
-    // }
   });
 });
 
@@ -422,15 +423,15 @@ router.post("/verifyOtp", (req, res) => {
 });
 
 router.post("/applyCoupon", (req, res) => {
-  userHelpers.applyCoupen(req.body, req.session.userId).then(async(response) => {
-    if (response){
-      let total=await userHelpers.getTotalPrice(req.session.userId);
-      discount=total-response.result;
-      response.total=total;
-      response.discount=discount;
-      res.json(response);
-    } 
-  });
+  userHelpers.applyCoupon(req.body, req.session.userId).then(async (response) => {
+      if (response) {
+        let total = await userHelpers.getTotalPrice(req.session.userId);
+        discount = total - response.result;
+        response.total = total;
+        response.discount = discount;
+        res.json(response);
+      }
+    });
 });
 
 router.get("/logout", (req, res) => {

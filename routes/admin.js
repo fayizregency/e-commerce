@@ -349,6 +349,12 @@ router.post('/editCoupen',(req,res)=>{
   })
 });
 
+router.get('/deleteCoupon/:id',(req,res)=>{
+  adminHelpers.deleteCoupon(req.params.id).then(()=>{
+    res.redirect('/admin/coupenCodes');
+  })
+})
+
 router.get('/offers', async(req,res)=>{
   let products=await productHelpers.getProduct();
   let category=await productHelpers.getAllCategory();
