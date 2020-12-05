@@ -146,7 +146,7 @@ function removeCart(cartId, prodId) {
       data: {
         cart: cartId,
         product: prodId,
-      },
+      },  
       success: (response) => {
         if (response) {
           location.reload();
@@ -178,7 +178,7 @@ $("#checkout-form").submit((e) => {
     $.ajax({
       url: "/placeOrder",
       method: "post",
-      data: fd,
+      data: fd, 
       cache: false,
       processData: false,
       contentType: false,
