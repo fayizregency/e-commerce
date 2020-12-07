@@ -172,7 +172,10 @@ router.get("/checkout", verifyUser, async (req, res) => {
 
 router.post("/placeOrder", async (req, res) => {
   console.log(req.body)
-  let discount = parseInt(req.body.coupon_off);
+  let discount=0;
+  if(req.body.coupon_off){
+  discount = parseInt(req.body.coupon_off);
+  }
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
   totalPrice = totalPrice - discount;
