@@ -12,7 +12,7 @@ $("#signup").click(function () {
     $(".empty").css("display", "block");
   } else {
     $.post(
-      "http://localhost:3000/signup",
+      "/signup",
       {
         fname: $("#name1").val(),
         phone: $("#name2").val(),
@@ -26,7 +26,7 @@ $("#signup").click(function () {
         console.log("Data: " + data + "\nStatus: " + status);
 
         if (data === "success") {
-          document.location.href = "http://localhost:3000/login";
+          document.location.href = "/login";
         } else if (data === "failed") {
           $(".empty").css("display", "none");
           $(".user").css("display", "none");
@@ -49,7 +49,7 @@ $("#signin").click(function () {
     $(".empty").css("display", "block");
   } else {
     $.post(
-      "http://localhost:3000/login",
+      "/login",
       {
         email: $("#your_name").val(),
         password: $("#your_pass").val(),
@@ -59,7 +59,7 @@ $("#signin").click(function () {
         console.log("Data: " + data + "\nStatus: " + status);
 
         if (data === "success") {
-          document.location.href = "http://localhost:3000";
+          document.location.href = "/";
         }else if(data==='blocked'){
           $(".empty").css("display", "none");
           $(".noUser").css("display", "none");
