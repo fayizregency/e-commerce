@@ -14,11 +14,11 @@ const { route } = require("./user");
 /* GET users listing. */
 
 const verifyAdmin = (req, res, next) => {
-  // if (req.session.admin) {
+  if (req.session.admin) {
   next();
-  // } else {
-  //   res.redirect("/admin/login");
-  // }
+  } else {
+    res.redirect("/admin/login");
+  }
 };
 
 router.get("/", async function (req, res, next) {
@@ -26,11 +26,11 @@ router.get("/", async function (req, res, next) {
   res.setHeader("Pragma", "no-cache"); // HTTP 1.0.
   res.setHeader("Expires", "0"); // Proxies.
 
-  // if (req.session.admin) {
+  if (req.session.admin) {
   res.render("admin/dash", { admin: true });
-  // } else {
-  // res.redirect("/admin/login");
-  // }
+  } else {
+  res.redirect("/admin/login");
+  }
 });
 
 router.get("/ajax/graph", (req, res) => {
@@ -41,7 +41,6 @@ router.get("/ajax/graph", (req, res) => {
       date.push(element._id.day);
       count.push(element.count);
     });
-    // console.log(count+"\n"+date);
     res.json({ count: count, date: date });
   });
 });
@@ -54,7 +53,6 @@ router.get("/ajax/lineChart", (req, res) => {
       date.push(element._id.day);
       sales.push(element.amount);
     });
-    // console.log(count+"\n"+date);
     res.json({ sales: sales, date: date });
   });
 });

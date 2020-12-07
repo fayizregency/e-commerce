@@ -152,7 +152,6 @@ module.exports = {
         let prodExist = userCart.products.findIndex(
           (product) => product.item == prodId
         );
-        // console.log(prodExist);
         if (prodExist != -1) {
           db.get()
             .collection(collection.CART_COLLECTION)

@@ -25,7 +25,10 @@
     {{#if admin}}
     {{>admin-header}}
     {{else}}
-    {{>user-header}}
+        {{#if error}}
+        {{else}}
+        {{>user-header}}
+        {{/if}}
     {{/if}}
     {{{body}}}
     {{>user-footer}}

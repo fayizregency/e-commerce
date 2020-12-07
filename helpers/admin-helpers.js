@@ -3,14 +3,12 @@ var collection = require("../config/collections");
 const { response } = require("express");
 const { Code } = require("mongodb");
 var objId = require("mongodb").ObjectID;
-// const pattern = date.compile("YYYY-MM-DD");
 
 module.exports = {
   getOrderReport: (date) => {
     return new Promise((resolve, reject) => {
       let startDate = date.startDate;
       let endDate = date.endDate;
-      // console.log(startDate + "\n" + endDate);
       db.get()
         .collection(collection.ORDER_COLLECTION)
         .aggregate([
@@ -90,7 +88,6 @@ module.exports = {
 
         .toArray()
         .then((response) => {
-          // console.log(response)
           resolve(response);
         });
     });

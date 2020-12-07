@@ -250,7 +250,6 @@ router.get("/orderSummary/:id", nocache, verifyUser, async (req, res) => {
     element.product.price = productTotal[index].total;
   });
   userHelpers.getOrderSummary(id).then((order) => {
-    // userHelpers.removeCart(req.session.userId);
     order.date = date.format(order.date, pattern);
     res.render("user/order-summary", {
       user: req.session.user,
@@ -287,7 +286,6 @@ router.get("/viewOrderProducts/:id", (req, res) => {
 router.get("/profile", verifyUser, async (req, res) => {
   let address = await userHelpers.getUserAddress(req.session.userId);
   userHelpers.getOneUser(req.session.userId).then((profile) => {
-    console.log(profile);
     profile.firstName = profile.firstName.toUpperCase();
     res.render("user/profile", { user: req.session.user, profile, address });
   });
@@ -362,7 +360,7 @@ router.post("/callOtp", (req, res) => {
   let user_phone = req.body.mobile;
   var options = {
     method: "POST",
-    // url: "https://d7networks.com/api/verifier/send",
+    url: "https://d7networks.com/api/verifier/send",
     headers: {
       Authorization: "Token 1eb6c6a9838dd3131947522bd7a12d10715af67f",
     },
