@@ -162,7 +162,7 @@ $("#checkout-form").submit((e) => {
     var myform = document.getElementById("checkout-form");
     var fd = new FormData(myform);
     let checked = false;
-    let coupon_off=$('#coupen-span').html()
+    let coupon_off=parseInt($('#coupen-span').html()) 
     let coupon_code=$('#coupon-input').val()
     if ($("#defaultCheck1").is(":checked")) {
       checked = true;
