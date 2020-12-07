@@ -179,15 +179,15 @@ router.post("/placeOrder", async (req, res) => {
   }
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
-  totalPrice = totalPrice - discount;
+  amount = totalPrice - discount;
 
   if (req.body.paymentMethod === "COD") {
-    userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
+    userHelpers.placeOrder(req.body, products, amount).then((response) => {
       userHelpers.removeCart(req.session.userId);
       res.json({ cod: response.id });
     });
   } else if (req.body.paymentMethod === "Razorpay") {
-    userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
+    userHelpers.placeOrder(req.body, products, amount).then((response) => {
       userHelpers
         .generateRazorpay(response.id, response.amount)
         .then((razorpay) => {
@@ -199,7 +199,7 @@ router.post("/placeOrder", async (req, res) => {
         });
     });
   } else if (req.body.paymentMethod === "paypal") {
-    userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
+    userHelpers.placeOrder(req.body, products, amount).then((response) => {
       userHelpers.removeCart(req.session.userId);
       res.json({
         paypal: {
