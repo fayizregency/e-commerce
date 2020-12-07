@@ -33,7 +33,7 @@ $("#addUser").click(function () {
             console.log("Data: " + data + "\nStatus: " + status);
 
             if (data === 'success') {
-                document.location.href = "http://localhost:3000/admin/users";
+                document.location.href = "/admin/users";
             }else if (data === 'failed') {
                 $('.empty').css("display","none");
                 $('.user').css('display', "none");
