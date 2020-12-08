@@ -36,7 +36,7 @@ router.get("/", async function (req, res, next) {
 router.get("/ajax/graph", (req, res) => {
   let count = [];
   var date = [];
-  adminHelpers.lastWeekOrder().then((weekly_reports) => {
+  adminHelpers.lastMonthOrder().then((weekly_reports) => {
     weekly_reports.forEach((element) => {
       date.push(element._id.day);
       count.push(element.count);
@@ -48,7 +48,7 @@ router.get("/ajax/graph", (req, res) => {
 router.get("/ajax/lineChart", (req, res) => {
   let sales = [];
   var date = [];
-  adminHelpers.lastWeekOrder().then((weekly_reports) => {
+  adminHelpers.lastMonthOrder().then((weekly_reports) => {
     weekly_reports.forEach((element) => {
       date.push(element._id.day);
       sales.push(element.amount);
@@ -79,7 +79,7 @@ router.get('/ajax/pieChart',async(req,res)=>{
 })
 
 const adminName = "admin";
-const adminPassword = "admin";
+const adminPassword = "admin@123";
 
 router.get("/login", function (req, res, next) {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
@@ -96,7 +96,7 @@ router.post("/login", (req, res) => {
   }
 });
 
-router.get("/orders", function (req, res, next) {
+router.get("/orders",verifyAdmin, function (req, res, next) {
   userHelpers.getAllOrders().then((orders) => {
     orders.forEach((element) => {
       element.date = date.format(element.date, pattern);
@@ -261,7 +261,7 @@ router.get("/deleteUser/:id", verifyAdmin, function (req, res, next) {
   });
 });
 
-router.get("/reports", async (req, res) => {
+router.get("/reports",verifyAdmin, async (req, res) => {
   let product_count = await productHelpers.getTotalNumberOfProducts();
   let user_count = await userHelpers.getTotalNoOfUsers();
   let category_count = await productHelpers.getTotalNoOfCategory();
@@ -281,29 +281,30 @@ router.get("/reports", async (req, res) => {
   });
 });
 
-router.post("/ordersByPeriod", (req, res) => {
+router.post("/ordersByPeriod",verifyAdmin, (req, res) => {
   let key = req.body;
   adminHelpers.getLastWeek(key).then((response) => {
     res.json({ orders: response });
   });
 });
 
-router.get('/salesReport',(req,res)=>{
+router.get('/salesReport',verifyAdmin, (req,res)=>{
   res.render('admin/sales-report',{admin:true})
 });
 
-router.get('/orderReport',(req,res)=>{
+router.get('/orderReport', verifyAdmin,(req,res)=>{
   res.render('admin/order-reports',{admin:true});
 });
 
-router.get('/cancelledOrders',async(req,res)=>{
+router.get('/cancelledOrders',verifyAdmin, async(req,res)=>{
   let cancel_orders = await adminHelpers.getCancelOrders();
   res.render('admin/cancelled-orders',{admin:true, cancel_orders})
 })
 
 router.post("/ajax/reports", async (req, res) => {
+  let fullOrders= await adminHelpers.getFullOrderReports(req.body);
   adminHelpers.getOrderReport(req.body).then((reports) => {
-    res.json({ reports: reports });
+    res.json({ reports: reports, fullOrders: fullOrders });
   });
 });
 
@@ -323,12 +324,12 @@ router.get('/ajax/blockUser', async(req,res)=>{
   res.json({ "users": all_users})
 });
 
-router.get('/coupenCodes', async(req,res)=>{
+router.get('/coupenCodes',verifyAdmin, async(req,res)=>{
   let coupens=await adminHelpers.getAllCoupens();
   res.render('admin/coupen-code', {admin:true, coupens});
 });
 
-router.post('/addCoupen',(req,res)=>{
+router.post('/addCoupen',verifyAdmin,(req,res)=>{
   adminHelpers.addCoupens(req.body).then(()=>{
     res.redirect('/admin/coupenCodes');
   })
@@ -353,7 +354,7 @@ router.get('/deleteCoupon/:id',(req,res)=>{
   })
 })
 
-router.get('/offers', async(req,res)=>{
+router.get('/offers',verifyAdmin, async(req,res)=>{
   let products=await productHelpers.getProduct();
   let category=await productHelpers.getAllCategory();
   res.render('admin/product-offer',{admin:true, products,category});

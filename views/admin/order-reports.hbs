@@ -23,9 +23,8 @@
         <thead>
           <tr>
             <th>customer</th>
-            <th>phone</th>
-            <th>Address</th>
             <th>order id</th>
+            <th>Amount</th>
             <th>order date</th>
             <th>payment method</th>
             <th>payment status</th>
@@ -63,7 +62,7 @@
         var output;
         $.each(d, function (i, e) {
           // here you structured the code depend on the table of yours
-          output += '<tr><td>' + e.deliveryDetails.name + '</td><td>' + e.deliveryDetails.phone + '</td><td>' + e.deliveryDetails.address + '</td><td>' + e._id + '</td><td>' + e.date + '</td><td>' + e.paymentMethod + '</td><td>' + e.payment_status + '</td><td>' + e.shipment_status + '</td></tr>';
+          output += '<tr><td>' + e.deliveryDetails.name + '</td><td>' + e._id + '</td><td>'+ e.amount +'</td><td>' + e.date + '</td><td>' + e.paymentMethod + '</td><td>' + e.payment_status + '</td><td>' + e.shipment_status + '</td></tr>';
         });
 
         // after finish creating html structure, append the output

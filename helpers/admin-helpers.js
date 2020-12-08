@@ -6,6 +6,7 @@ var objId = require("mongodb").ObjectID;
 
 module.exports = {
   getOrderReport: (date) => {
+    /* for custom date- admin sales report */
     return new Promise((resolve, reject) => {
       let startDate = date.startDate;
       let endDate = date.endDate;
@@ -50,7 +51,61 @@ module.exports = {
         });
     });
   },
-  lastWeekOrder: () => {
+  getFullOrderReports: (date) => {
+    /*for custom date - admin daily orders section */
+    let startDate = date.startDate;
+    let endDate = date.endDate;
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+
+        .aggregate([
+          {
+            $project: {
+              date: {
+                $dateToString: { date: "$date", format: "%Y-%m-%d" },
+              },
+              products: 1,
+              amount: 1,
+            },
+          },
+          {
+            $match: {
+              date: {
+                $gte: startDate,
+                $lte: endDate,
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              date: 1,
+              amount: 1,
+            },
+          },
+          {
+            $group: {
+              _id: {
+                date : "$date"
+              },
+              amount: { $sum: { $multiply: ["$amount", 1] } },
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $sort: { _id: 1 },
+          },
+        ])
+
+        .toArray()
+        .then((response) => {
+          resolve(response);
+        });
+    });
+  },
+  lastMonthOrder: () => {
+    /*for the admin chart section */
     return new Promise((resolve, reject) => {
       db.get()
         .collection(collection.ORDER_COLLECTION)
@@ -81,9 +136,8 @@ module.exports = {
             },
           },
           {
-            $sort:{_id:1}
+            $sort: { _id: 1 },
           },
-          
         ])
 
         .toArray()
@@ -93,6 +147,7 @@ module.exports = {
     });
   },
   getLastWeek: (key) => {
+    /* for admin order report by time period */
     return new Promise((resolve, reject) => {
       db.get()
         .collection(collection.ORDER_COLLECTION)
@@ -136,7 +191,7 @@ module.exports = {
             }
           )
           .then(() => {
-            resolve({blocked:true});
+            resolve({ blocked: true });
           })
           .catch((err) => {
             console.log(err);
@@ -154,7 +209,7 @@ module.exports = {
             }
           )
           .then(() => {
-            resolve({blocked:false});
+            resolve({ blocked: false });
           })
           .catch((err) => {
             console.log(err);
@@ -163,58 +218,76 @@ module.exports = {
       }
     });
   },
-  addCoupens:(data)=>{
+  addCoupens: (data) => {
     console.log(data);
-    return new Promise((resolve, reject)=>{
-      db.get().collection(collection.COUPEN_COLLECTION).insertOne(
-        {
-          coupenCode:data.coupen_code,
-          offer:data.offer,
-          expDate:data.exp_time
-        }
-      ).then(()=>{
-        resolve();
-      }).catch((err)=>{
-        console.log(err);
-      })
-    })
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.COUPEN_COLLECTION)
+        .insertOne({
+          coupenCode: data.coupen_code,
+          offer: data.offer,
+          expDate: data.exp_time,
+        })
+        .then(() => {
+          resolve();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
   },
-  getAllCoupens:()=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.COUPEN_COLLECTION).find().toArray().then((coupens)=>{
-        resolve(coupens);
-      }).catch((err)=>{
-        console.log(err);
-        reject();
-      })
-    })
+  getAllCoupens: () => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.COUPEN_COLLECTION)
+        .find()
+        .toArray()
+        .then((coupens) => {
+          resolve(coupens);
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        });
+    });
   },
-  getOneCoupen:(id)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.COUPEN_COLLECTION).findOne({_id:objId(id)}).then((coupen)=>{
-        resolve(coupen);
-      })
-    })
+  getOneCoupen: (id) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.COUPEN_COLLECTION)
+        .findOne({ _id: objId(id) })
+        .then((coupen) => {
+          resolve(coupen);
+        });
+    });
   },
-  editCoupen:(data)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.COUPEN_COLLECTION).updateOne({_id:objId(data.coupen_id)},
-      {
-        $set:{
-          coupenCode:data.coupen_code,
-          offer:data.offer,
-          expDate:data.exp_time
-        }
-      }).then(()=>{
-        resolve();
-      })
-    })
+  editCoupen: (data) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.COUPEN_COLLECTION)
+        .updateOne(
+          { _id: objId(data.coupen_id) },
+          {
+            $set: {
+              coupenCode: data.coupen_code,
+              offer: data.offer,
+              expDate: data.exp_time,
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
+    });
   },
-  deleteCoupon:(id)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.COUPEN_COLLECTION).removeOne({_id:objId(id)}).then(()=>{
-        resolve();
-      })
-    })
-  }
+  deleteCoupon: (id) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.COUPEN_COLLECTION)
+        .removeOne({ _id: objId(id) })
+        .then(() => {
+          resolve();
+        });
+    });
+  },
 };

@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4 row">
-    
+
     <div class="pt-5">
       <h2>Sales Reports( custom date )</h2>
       {{!-- <p>The .table-bordered class adds borders to a table:</p> --}}
@@ -9,30 +9,44 @@
         <span class="ml-2">End date<input class="ml-2" id="end-date" type="date" value=""></span>
         <button id="getReport" class="ml-2 btn btn-light">submit</button>
       </div>
-      <table class="table table-bordered" >
+      <div>
+        <div class="form-group row">
+          <label for="disabledTextInput" class="col-sm-2 col-form-label col-form-label-sm">Date</label>
+          <div class="col-sm-5">
+            <input class="form-control form-control-sm"  type="text" id="selected-date" placeholder="" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="disabledTextInput" class="col-sm-2 col-form-label col-form-label-sm">Orders</label>
+          <div class="col-sm-5">
+            <input class="form-control form-control-sm" id="total-orders" type="text" placeholder="" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="disabledTextInput" class="col-sm-2 col-form-label col-form-label-sm">Products sold</label>
+          <div class="col-sm-5">
+            <input class="form-control form-control-sm" id="total-products" type="text" placeholder="" disabled>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="disabledTextInput" class="col-sm-2 col-form-label col-form-label-sm">Amount</label>
+          <div class="col-sm-5">
+            <input class="form-control form-control-sm" id="total-amount" type="text" placeholder="" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-bordered table-sm" id="sales-table">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Total Orders</th>
-            <th>Total products sold</th>
-            <th>Amount</th>
+            <th>date</th>
+            <th>Total order</th>
+            <th>Total Amount</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td id="selected-date"></td>
-            <td id="total-orders"></td>
-            <td id="total-products"></td>
-            <td id="total-amount"></td>
-          </tr>
-        </tbody>
       </table>
     </div>
-
-     
-
-
-     
   </main>
 </div>
 
@@ -46,7 +60,6 @@
   $('#getReport').click(function () {
     let startDate = $('#start-date').val();
     let endDate = $('#end-date').val();
-    console.log(startDate, endDate);
 
     $.ajax({
       url: '/admin/ajax/reports',
@@ -56,12 +69,24 @@
         "endDate": endDate
       },
       success: (response) => {
-        console.log(response.reports)
-        if (response.reports) {
-          document.getElementById('selected-date').innerHTML = startDate + " to " + endDate;
-          document.getElementById('total-orders').innerHTML = response.reports.total_orders
-          document.getElementById('total-products').innerHTML = response.reports.total_products
-          document.getElementById('total-amount').innerHTML = "₹ " + response.reports.total_amount
+        if (response.reports && response.fullOrders) {
+          document.getElementById('selected-date').value = startDate + " to " + endDate;
+          document.getElementById('total-orders').value = response.reports.total_orders;
+          document.getElementById('total-products').value = response.reports.total_products;
+          document.getElementById('total-amount').value = "₹ " + response.reports.total_amount;
+
+          var d = (response.fullOrders);
+          // d = [{ name : 'john', phone : 123 }]; --> example
+          // this depend on your returned data from controller
+          var output;
+          $.each(d, function (i, e) {
+            // here you structured the code depend on the table of yours
+            output += '<tr><td>' + e._id.date + '</td><td>' + e.count + '</td><td>' + e.amount + '</td></tr>';
+          });
+
+          // after finish creating html structure, append the output
+          // into the table
+          $('#sales-table').append(output);
         }
       }
     })

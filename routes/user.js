@@ -443,8 +443,4 @@ router.get("/logout", (req, res) => {
   res.json({ response: true });
 });
 
-router.get("/sample", (req, res) => {
-  res.render("user/sample");
-});
-
 module.exports = router;
