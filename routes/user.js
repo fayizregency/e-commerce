@@ -109,11 +109,15 @@ router.get("/view/:id", async (req, res) => {
 });
 
 router.get("/addToCart/:id", (req, res) => {
-  let userId = req.session.userId;
-  let prodId = req.params.id;
-  userHelpers.addToCart(prodId, userId).then(() => {
-    res.json({ status: true });
-  });
+  if (req.session.loggedIn) {
+    let userId = req.session.userId;
+    let prodId = req.params.id;
+    userHelpers.addToCart(prodId, userId).then(() => {
+      res.json({ status: true });
+    });
+  }else{
+    res.json({status:false})
+  }
 });
 router.get("/cart", verifyUser, async (req, res) => {
   let cartCount = null;
@@ -171,11 +175,11 @@ router.get("/checkout", verifyUser, async (req, res) => {
 });
 
 router.post("/placeOrder", async (req, res) => {
-  console.log(req.body)
-  let discount=0;
-  let parsedCoupon = parseInt(req.body.coupon_off)
-  if(!Number.isNaN(parsedCoupon)){
-  discount = parsedCoupon;
+  console.log(req.body);
+  let discount = 0;
+  let parsedCoupon = parseInt(req.body.coupon_off);
+  if (!Number.isNaN(parsedCoupon)) {
+    discount = parsedCoupon;
   }
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalPrice(req.body.userId);
@@ -425,7 +429,9 @@ router.post("/verifyOtp", (req, res) => {
 });
 
 router.post("/applyCoupon", (req, res) => {
-  userHelpers.applyCoupon(req.body, req.session.userId).then(async (response) => {
+  userHelpers
+    .applyCoupon(req.body, req.session.userId)
+    .then(async (response) => {
       if (response) {
         let total = await userHelpers.getTotalPrice(req.session.userId);
         discount = total - response.result;

@@ -92,6 +92,8 @@ function addToCart(prodId) {
         let count = $("#cart-count").html();
         count = parseInt(count) + 1;
         $("#cart-count").html(count);
+      }else{
+        window.location.href='/login'
       }
     },
   });
